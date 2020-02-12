@@ -5,8 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -24,6 +23,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var locationRequest: LocationRequest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,30 +52,60 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         } else {
 
-            fusedLocationClient.lastLocation
-                .addOnCompleteListener {
-
-                    val location = it.result
-
-                    if (location != null) {
-
-                        val latLng = LatLng(location.latitude, location.longitude)
-                        val marker = MarkerOptions().position(latLng)
-                            .title("You are here")
-                        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
-
-                        map.addMarker(marker)
-                        map.moveCamera(cameraUpdate)
-
-
-                    } else {
-                        Timber.e("No location found")
-                    }
-
-                }
+            requestPeriodicLocationUpdate()
+            zoomInToCurrentLocation()
 
         }
 
+    }
+
+    private fun requestPeriodicLocationUpdate() {
+        if (locationRequest == null) {
+
+            locationRequest = LocationRequest.create().apply {
+
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                interval = 500
+                fastestInterval = 1000
+
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    getLocationCallback(),
+                    null
+                )
+
+            }
+        }
+    }
+
+    private fun zoomInToCurrentLocation() {
+        fusedLocationClient.lastLocation
+            .addOnCompleteListener {
+
+                val location = it.result
+
+                if (location != null) {
+
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    val marker = MarkerOptions().position(latLng)
+                        .title("You are here")
+                    val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
+
+                    map.addMarker(marker)
+                    map.moveCamera(cameraUpdate)
+
+
+                } else {
+                    Timber.e("No location found")
+                }
+
+            }
+    }
+
+    private fun getLocationCallback() = object: LocationCallback() {
+        override fun onLocationResult(p0: LocationResult?) {
+            getCurrentLocation()
+        }
     }
 
     private fun locationPermissionNotGranted(): Boolean {
