@@ -91,6 +91,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         .title("You are here")
                     val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
 
+                    map.clear() // Remove previous marker
                     map.addMarker(marker)
                     map.moveCamera(cameraUpdate)
 
