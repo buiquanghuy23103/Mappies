@@ -1,4 +1,4 @@
-package com.huy.mappies
+package com.huy.mappies.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -22,6 +22,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.huy.mappies.R
 import com.huy.mappies.adapter.MarkerInfoWindowAdapter
 import timber.log.Timber
 
@@ -105,14 +106,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun locationPermissionNotGranted(): Boolean {
-        val permission = ActivityCompat.checkSelfPermission(this, LOCATION_PERMISSION)
+        val permission = ActivityCompat.checkSelfPermission(this,
+            LOCATION_PERMISSION
+        )
         val grantedPermission = PackageManager.PERMISSION_GRANTED
         return permission != grantedPermission
     }
 
     private fun requestLocationPermissions() {
         val permissions = arrayOf(LOCATION_PERMISSION)
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION)
+        ActivityCompat.requestPermissions(this, permissions,
+            REQUEST_LOCATION
+        )
     }
 
     override fun onRequestPermissionsResult(
