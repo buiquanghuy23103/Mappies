@@ -1,4 +1,4 @@
-package com.huy.mappies
+package com.huy.mappies.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -6,6 +6,9 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -13,17 +16,23 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PointOfInterest
+import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.PhotoMetadata
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.huy.mappies.R
 import com.huy.mappies.adapter.MarkerInfoWindowAdapter
+import com.huy.mappies.getAppInjector
+import com.huy.mappies.model.BookmarkView
+import com.huy.mappies.model.PlaceInfo
+import com.huy.mappies.viewmodel.MapsViewModel
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -32,13 +41,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
     }
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var placesClient: PlacesClient
+    private lateinit var viewModel: MapsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        getAppInjector().inject(this)
+        setupViewModel()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -47,11 +62,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setupPlacesClient()
     }
 
+    private fun setupViewModel() {
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+            .get(MapsViewModel::class.java)
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-        setupInfoWindow()
+        setupMapsListener()
+        observeBookmarkViews()
         getCurrentLocation()
-        setupPoiClickListener()
     }
 
     private fun setupLocationClient() {
@@ -62,6 +82,31 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val apiKey = getString(R.string.google_maps_key)
         Places.initialize(this, apiKey)
         placesClient = Places.createClient(this)
+    }
+
+    private fun observeBookmarkViews() {
+
+        viewModel.allBookmarkViews.observe(this, Observer {
+            map.clear()
+            it?.let {
+                it.forEach(this::displayBookmark)
+            }
+        })
+
+    }
+
+    private fun displayBookmark(bookmarkView: BookmarkView) {
+        val defaultMarkerIcon = BitmapDescriptorFactory.defaultMarker(
+            BitmapDescriptorFactory.HUE_AZURE
+        )
+
+        val markerOptions = MarkerOptions()
+            .position(LatLng(bookmarkView.latitude, bookmarkView.longtitude))
+            .icon(defaultMarkerIcon)
+            .alpha(0.8f)
+
+        val marker = map.addMarker(markerOptions)
+        marker.tag = bookmarkView
     }
 
     private fun getCurrentLocation() {
@@ -105,14 +150,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun locationPermissionNotGranted(): Boolean {
-        val permission = ActivityCompat.checkSelfPermission(this, LOCATION_PERMISSION)
+        val permission = ActivityCompat.checkSelfPermission(this,
+            LOCATION_PERMISSION
+        )
         val grantedPermission = PackageManager.PERMISSION_GRANTED
         return permission != grantedPermission
     }
 
     private fun requestLocationPermissions() {
         val permissions = arrayOf(LOCATION_PERMISSION)
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION)
+        ActivityCompat.requestPermissions(this, permissions,
+            REQUEST_LOCATION
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -129,9 +178,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun setupPoiClickListener() {
+    private fun setupMapsListener() {
+        setupInfoWindow()
         map.setOnPoiClickListener {
             displayPlaceDetail(it)
+        }
+        map.setOnInfoWindowClickListener {
+            handleInfoWindowClick(it)
         }
     }
 
@@ -148,6 +201,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
 
+    }
+
+    private fun handleInfoWindowClick(marker: Marker) {
+        val placeInfo = marker.tag as PlaceInfo
+        if (placeInfo.place != null) {
+            GlobalScope.launch {
+                viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
+            }
+        }
+        marker.remove()
     }
 
     private fun getPlaceDetailRequest(pointOfInterest: PointOfInterest): FetchPlaceRequest {
@@ -207,7 +270,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         map.clear()
         val marker = map.addMarker(markerOptions)
-        marker.tag = bitmap
+        marker.tag = PlaceInfo(place, bitmap)
     }
 
     private fun setupInfoWindow() {
