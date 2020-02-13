@@ -7,6 +7,7 @@ import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.huy.mappies.R
+import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 
 class MarkerInfoWindowAdapter private constructor(private val markerView: View)
@@ -27,17 +28,32 @@ class MarkerInfoWindowAdapter private constructor(private val markerView: View)
 
     override fun getInfoContents(marker: Marker?): View {
 
-        val placeInfo: PlaceInfo? = marker?.tag as PlaceInfo
-
         val titleTextView = markerView.findViewById<TextView>(R.id.marker_title)
-        titleTextView.text = marker.title.toString()
+        titleTextView.text = marker?.title.toString()
 
         val subtitleTextView = markerView.findViewById<TextView>(R.id.marker_subtitle)
-        subtitleTextView.text = marker.snippet ?: ""
+        subtitleTextView.text = marker?.snippet ?: ""
 
-        val imageView = markerView.findViewById<ImageView>(R.id.marker_image)
-        imageView.setImageBitmap(placeInfo?.image)
+        displayImage(marker)
 
         return markerView
     }
+
+    private fun displayImage(marker: Marker?) {
+        when(marker?.tag) {
+
+            is PlaceInfo -> {
+                val placeInfo: PlaceInfo? = marker.tag as PlaceInfo
+                val imageView = markerView.findViewById<ImageView>(R.id.marker_image)
+                imageView.setImageBitmap(placeInfo?.image)
+            }
+
+            is BookmarkView -> {
+                val bookmarkView = marker.tag as BookmarkView
+                // TODO: set place image from bookmarkView
+            }
+
+        }
+    }
+
 }
