@@ -2,8 +2,8 @@ package com.huy.mappies
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ApiException
@@ -13,11 +13,14 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.PhotoMetadata
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import timber.log.Timber
@@ -133,6 +136,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun displayPlaceDetail(pointOfInterest: PointOfInterest) {
 
+        placesClient.fetchPlace(getPlaceDetailRequest(pointOfInterest))
+            .addOnSuccessListener { response ->
+                val place = response.place
+                displayPlacePhoto(place)
+            }
+            .addOnFailureListener {error ->
+                if (error is ApiException) {
+                    Timber.e("Place not found: ${error.message}, statusCode=${error.statusCode}")
+                }
+            }
+
+    }
+
+    private fun getPlaceDetailRequest(pointOfInterest: PointOfInterest): FetchPlaceRequest {
         val placeId = pointOfInterest.placeId
 
         val placeFields = listOf(
@@ -144,20 +161,57 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Place.Field.LAT_LNG
         )
 
-        val placeRequest = FetchPlaceRequest.builder(placeId, placeFields)
+        return FetchPlaceRequest.builder(placeId, placeFields)
             .build()
+    }
 
-        placesClient.fetchPlace(placeRequest)
-            .addOnSuccessListener { response ->
-                val place = response.place
-                val text = "${place.name}, ${place.phoneNumber}"
-                Toast.makeText(this, text, Toast.LENGTH_LONG).show()
-            }
-            .addOnFailureListener {error ->
-                if (error is ApiException) {
-                    Timber.e("Place not found: ${error.message}, statusCode=${error.statusCode}")
+    private fun displayPlacePhoto(place: Place) {
+
+        val photoMetadata: PhotoMetadata? = place.photoMetadatas?.get(0)
+
+        if (photoMetadata == null) {
+            addPhotoToMarker(place, null)
+            return
+        } else {
+
+            val photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                .setMaxWidth(resources.getDimensionPixelSize(R.dimen.default_image_width))
+                .setMaxHeight(resources.getDimensionPixelSize(R.dimen.default_image_height))
+                .build()
+
+            placesClient.fetchPhoto(photoRequest)
+                .addOnSuccessListener { response ->
+                    val bitmap = response.bitmap
+                    addPhotoToMarker(place, bitmap)
                 }
-            }
+                .addOnFailureListener {error ->
+                    if (error is ApiException) {
+                        Timber.e("Place photo not found: ${error.message}, statusCode=${error.statusCode}")
+                    } else {
+                        Timber.e(error)
+                    }
+                }
+
+
+        }
+
+    }
+
+    private fun addPhotoToMarker(place: Place, bitmap: Bitmap?) {
+
+        val markerPhoto = if (bitmap == null) {
+            BitmapDescriptorFactory.defaultMarker()
+        } else {
+            BitmapDescriptorFactory.fromBitmap(bitmap)
+        }
+
+        val markerOptions = MarkerOptions()
+            .position(place.latLng ?: LatLng(42.90237, -78.8704978))
+            .icon(markerPhoto)
+            .title(place.name)
+            .snippet(place.phoneNumber)
+
+        map.addMarker(markerOptions)
 
     }
 
