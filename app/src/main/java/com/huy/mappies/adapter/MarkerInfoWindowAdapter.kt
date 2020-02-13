@@ -1,7 +1,9 @@
 package com.huy.mappies.adapter
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
@@ -29,6 +31,9 @@ class MarkerInfoWindowAdapter private constructor(private val markerView: View)
 
         val subtitleTextView = markerView.findViewById<TextView>(R.id.marker_subtitle)
         subtitleTextView.text = marker?.snippet ?: ""
+
+        val imageView = markerView.findViewById<ImageView>(R.id.marker_image)
+        imageView.setImageBitmap(marker?.tag as Bitmap?)
 
         return markerView
     }

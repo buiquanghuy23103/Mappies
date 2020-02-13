@@ -206,8 +206,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .snippet(place.phoneNumber)
 
         map.clear()
-        map.addMarker(markerOptions)
-
+        val marker = map.addMarker(markerOptions)
+        marker.tag = bitmap
     }
 
     private fun setupInfoWindow() {

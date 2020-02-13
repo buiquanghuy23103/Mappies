@@ -7,7 +7,7 @@
     android:padding="@dimen/padding_extreme_small">
 
     <ImageView
-        android:id="@+id/marker_photo"
+        android:id="@+id/marker_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_extreme_small"
