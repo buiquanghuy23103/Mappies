@@ -27,7 +27,7 @@ class MarkerInfoWindowAdapter private constructor(private val markerView: View)
 
     override fun getInfoContents(marker: Marker?): View {
 
-        val placeInfo: PlaceInfo = marker?.tag as PlaceInfo
+        val placeInfo: PlaceInfo? = marker?.tag as PlaceInfo
 
         val titleTextView = markerView.findViewById<TextView>(R.id.marker_title)
         titleTextView.text = marker.title.toString()
@@ -36,7 +36,7 @@ class MarkerInfoWindowAdapter private constructor(private val markerView: View)
         subtitleTextView.text = marker.snippet ?: ""
 
         val imageView = markerView.findViewById<ImageView>(R.id.marker_image)
-        imageView.setImageBitmap(placeInfo.image)
+        imageView.setImageBitmap(placeInfo?.image)
 
         return markerView
     }

@@ -30,6 +30,8 @@ import com.huy.mappies.adapter.MarkerInfoWindowAdapter
 import com.huy.mappies.getAppInjector
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.viewmodel.MapsViewModel
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -179,7 +181,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun handleInfoWindowClick(marker: Marker) {
         val placeInfo = marker.tag as PlaceInfo
         if (placeInfo.place != null) {
-            viewModel.addMarkerFromPlace(placeInfo.place, placeInfo.image)
+            GlobalScope.launch {
+                viewModel.addMarkerFromPlace(placeInfo.place, placeInfo.image)
+            }
         }
         marker.remove()
     }
