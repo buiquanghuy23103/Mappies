@@ -12,21 +12,17 @@ import com.huy.mappies.model.Marker
 )
 abstract class MappiesDatabase: RoomDatabase() {
 
+    abstract fun markerDao(): MarkerDao
+
     companion object {
-        private var instance: MappiesDatabase? = null
+        fun create(context: Context): MappiesDatabase {
 
-        fun getInstance(context: Context): MappiesDatabase {
+            return Room.databaseBuilder(
+                context.applicationContext,
+                MappiesDatabase::class.java,
+                "Mappies"
+            ).build()
 
-            if (instance == null) {
-
-                instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    MappiesDatabase::class.java,
-                    "Mappies"
-                ).build()
-            }
-
-            return instance as MappiesDatabase
 
         }
     }
