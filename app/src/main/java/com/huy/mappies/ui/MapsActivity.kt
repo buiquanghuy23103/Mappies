@@ -25,9 +25,9 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
 import com.huy.mappies.adapter.MarkerInfoWindowAdapter
-import com.huy.mappies.getAppInjector
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
+import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
