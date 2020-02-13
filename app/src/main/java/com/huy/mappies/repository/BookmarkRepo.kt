@@ -26,6 +26,6 @@ class BookmarkRepo @Inject constructor(
         )
     }
 
-    val allBookmarks = bookmarkDao.getAll()
+    val allBookmarkViews = bookmarkDao.getAllBookmarkViews()
 
 }

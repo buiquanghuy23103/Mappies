@@ -3,6 +3,7 @@ package com.huy.mappies.db
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.huy.mappies.model.Bookmark
+import com.huy.mappies.model.BookmarkView
 
 @Dao
 interface BookmarkDao {
@@ -11,7 +12,7 @@ interface BookmarkDao {
     fun insert(marker: Bookmark): Long
 
     @Query("SELECT * FROM bookmark")
-    fun getAll(): LiveData<List<Bookmark>>
+    fun getAllBookmarkViews(): LiveData<List<BookmarkView>>
 
     @Query("SELECT * FROM bookmark WHERE id = :id")
     fun get(id: Long): Bookmark

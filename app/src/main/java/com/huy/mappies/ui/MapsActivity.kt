@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.common.api.ApiException
@@ -15,10 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PointOfInterest
+import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.PhotoMetadata
 import com.google.android.libraries.places.api.model.Place
@@ -28,6 +26,7 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
 import com.huy.mappies.adapter.MarkerInfoWindowAdapter
 import com.huy.mappies.getAppInjector
+import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.coroutines.GlobalScope
@@ -54,6 +53,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         getAppInjector().inject(this)
+        setupViewModel()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -70,7 +70,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         setupMapsListener()
-        setupViewModel()
+        observeBookmarkViews()
         getCurrentLocation()
     }
 
@@ -82,6 +82,31 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val apiKey = getString(R.string.google_maps_key)
         Places.initialize(this, apiKey)
         placesClient = Places.createClient(this)
+    }
+
+    private fun observeBookmarkViews() {
+
+        viewModel.allBookmarkViews.observe(this, Observer {
+            map.clear()
+            it?.let {
+                it.forEach(this::displayBookmark)
+            }
+        })
+
+    }
+
+    private fun displayBookmark(bookmarkView: BookmarkView) {
+        val defaultMarkerIcon = BitmapDescriptorFactory.defaultMarker(
+            BitmapDescriptorFactory.HUE_AZURE
+        )
+
+        val markerOptions = MarkerOptions()
+            .position(LatLng(bookmarkView.latitude, bookmarkView.longtitude))
+            .icon(defaultMarkerIcon)
+            .alpha(0.8f)
+
+        val marker = map.addMarker(markerOptions)
+        marker.tag = bookmarkView
     }
 
     private fun getCurrentLocation() {
