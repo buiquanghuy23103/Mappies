@@ -4,16 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.huy.mappies.model.Marker
+import com.huy.mappies.model.Bookmark
 
 @Database(
-    entities = [Marker::class],
+    entities = [Bookmark::class],
     version = 1,
     exportSchema = false
 )
 abstract class MappiesDatabase: RoomDatabase() {
 
-    abstract fun markerDao(): MarkerDao
+    abstract fun bookmarkDao(): BookmarkDao
 
     companion object {
         fun create(context: Context): MappiesDatabase {

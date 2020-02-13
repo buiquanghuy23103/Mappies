@@ -13,6 +13,6 @@ class DatabaseModule {
     fun provideDatabase(context: Context) = MappiesDatabase.create(context)
 
     @Provides
-    fun provideMarkerDao(db: MappiesDatabase) = db.markerDao()
+    fun provideBookmarkDao(db: MappiesDatabase) = db.bookmarkDao()
 
 }

@@ -182,7 +182,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val placeInfo = marker.tag as PlaceInfo
         if (placeInfo.place != null) {
             GlobalScope.launch {
-                viewModel.addMarkerFromPlace(placeInfo.place, placeInfo.image)
+                viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
             }
         }
         marker.remove()

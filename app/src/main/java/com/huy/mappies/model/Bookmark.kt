@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Marker(
+data class Bookmark(
     @PrimaryKey(autoGenerate = true)
     var id: Long? = null,
 

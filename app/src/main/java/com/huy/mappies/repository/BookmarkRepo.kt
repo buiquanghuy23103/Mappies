@@ -1,22 +1,22 @@
 package com.huy.mappies.repository
 
 import com.google.android.libraries.places.api.model.Place
-import com.huy.mappies.db.MarkerDao
-import com.huy.mappies.model.Marker
+import com.huy.mappies.db.BookmarkDao
+import com.huy.mappies.model.Bookmark
 import javax.inject.Inject
 
-class MarkerRepo @Inject constructor(
-    private val markerDao: MarkerDao
+class BookmarkRepo @Inject constructor(
+    private val bookmarkDao: BookmarkDao
 ) {
 
-    fun addMarker(marker: Marker): Long? {
-        val newId = markerDao.insert(marker)
-        marker.id = newId
+    fun addBookmark(bookmark: Bookmark): Long? {
+        val newId = bookmarkDao.insert(bookmark)
+        bookmark.id = newId
         return newId
     }
 
-    fun createMarker(place: Place): Marker {
-        return Marker(
+    fun createBookmark(place: Place): Bookmark {
+        return Bookmark(
             placeId = place.id,
             name = place.name.toString(),
             latitude = place.latLng?.latitude ?: 0.0,
@@ -26,6 +26,6 @@ class MarkerRepo @Inject constructor(
         )
     }
 
-    val allMarkers = markerDao.getAll()
+    val allBookmarks = bookmarkDao.getAll()
 
 }
