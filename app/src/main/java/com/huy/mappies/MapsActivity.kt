@@ -13,7 +13,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PointOfInterest
@@ -23,6 +22,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.huy.mappies.adapter.MarkerInfoWindowAdapter
 import timber.log.Timber
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -49,6 +49,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        setupInfoWindow()
         getCurrentLocation()
         setupPoiClickListener()
     }
@@ -199,21 +200,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun addPhotoToMarker(place: Place, bitmap: Bitmap?) {
 
-        val markerPhoto = if (bitmap == null) {
-            BitmapDescriptorFactory.defaultMarker()
-        } else {
-            BitmapDescriptorFactory.fromBitmap(bitmap)
-        }
-
         val markerOptions = MarkerOptions()
             .position(place.latLng ?: LatLng(42.90237, -78.8704978))
-            .icon(markerPhoto)
             .title(place.name)
             .snippet(place.phoneNumber)
 
-        map.clear() // Clear old markers
+        map.clear()
         map.addMarker(markerOptions)
 
+    }
+
+    private fun setupInfoWindow() {
+        val infoWindowAdapter = MarkerInfoWindowAdapter.from(layoutInflater)
+        map.setInfoWindowAdapter(infoWindowAdapter)
     }
 
 }
