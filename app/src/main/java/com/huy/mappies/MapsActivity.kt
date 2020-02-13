@@ -211,6 +211,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .title(place.name)
             .snippet(place.phoneNumber)
 
+        map.clear() // Clear old markers
         map.addMarker(markerOptions)
 
     }
