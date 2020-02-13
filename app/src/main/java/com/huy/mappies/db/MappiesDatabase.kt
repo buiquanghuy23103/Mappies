@@ -8,7 +8,8 @@ import com.huy.mappies.model.Marker
 
 @Database(
     entities = [Marker::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class MappiesDatabase: RoomDatabase() {
 

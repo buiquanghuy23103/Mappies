@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -24,7 +26,10 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
 import com.huy.mappies.adapter.MarkerInfoWindowAdapter
+import com.huy.mappies.getAppInjector
+import com.huy.mappies.viewmodel.MapsViewModel
 import timber.log.Timber
+import javax.inject.Inject
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -33,19 +38,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
     }
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var placesClient: PlacesClient
+    private lateinit var viewModel: MapsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        setupViewModel()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         setupLocationClient()
         setupPlacesClient()
+    }
+
+    private fun setupViewModel() {
+        getAppInjector().inject(this)
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+            .get(MapsViewModel::class.java)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
