@@ -3,6 +3,7 @@ package com.huy.mappies
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -38,6 +39,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         getCurrentLocation()
+        setupPoiClickListener()
     }
 
     private fun setupLocationClient() {
@@ -106,6 +108,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 Timber.e("Location permission denied")
             }
+        }
+    }
+
+    private fun setupPoiClickListener() {
+        map.setOnPoiClickListener {
+            Toast.makeText(this, it.name, Toast.LENGTH_LONG)
+                .show()
         }
     }
 
