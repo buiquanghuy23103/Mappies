@@ -16,6 +16,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.libraries.places.api.Places
@@ -27,6 +28,7 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
 import com.huy.mappies.adapter.MarkerInfoWindowAdapter
 import com.huy.mappies.getAppInjector
+import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.viewmodel.MapsViewModel
 import timber.log.Timber
 import javax.inject.Inject
@@ -49,7 +51,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        setupViewModel()
+        getAppInjector().inject(this)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -59,16 +61,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupViewModel() {
-        getAppInjector().inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(MapsViewModel::class.java)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-        setupInfoWindow()
+        setupMapsListener()
+        setupViewModel()
         getCurrentLocation()
-        setupPoiClickListener()
     }
 
     private fun setupLocationClient() {
@@ -150,9 +151,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun setupPoiClickListener() {
+    private fun setupMapsListener() {
+        setupInfoWindow()
         map.setOnPoiClickListener {
             displayPlaceDetail(it)
+        }
+        map.setOnInfoWindowClickListener {
+            handleInfoWindowClick(it)
         }
     }
 
@@ -169,6 +174,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
 
+    }
+
+    private fun handleInfoWindowClick(marker: Marker) {
+        val placeInfo = marker.tag as PlaceInfo
+        if (placeInfo.place != null) {
+            viewModel.addMarkerFromPlace(placeInfo.place, placeInfo.image)
+        }
+        marker.remove()
     }
 
     private fun getPlaceDetailRequest(pointOfInterest: PointOfInterest): FetchPlaceRequest {
@@ -228,7 +241,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         map.clear()
         val marker = map.addMarker(markerOptions)
-        marker.tag = bitmap
+        marker.tag = PlaceInfo(place, bitmap)
     }
 
     private fun setupInfoWindow() {
