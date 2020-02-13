@@ -133,14 +133,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (location != null) {
 
                     val latLng = LatLng(location.latitude, location.longitude)
-                    val marker = MarkerOptions().position(latLng)
+                    val markerOptions = MarkerOptions().position(latLng)
                         .title("You are here")
                     val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
 
                     map.clear() // Remove previous marker
-                    map.addMarker(marker)
+                    map.addMarker(markerOptions)
                     map.moveCamera(cameraUpdate)
-
 
                 } else {
                     Timber.e("No location found")
@@ -271,6 +270,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map.clear()
         val marker = map.addMarker(markerOptions)
         marker.tag = PlaceInfo(place, bitmap)
+        marker.showInfoWindow()
     }
 
     private fun setupInfoWindow() {
