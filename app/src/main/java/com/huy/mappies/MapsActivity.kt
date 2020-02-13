@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -14,7 +15,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import timber.log.Timber
 
@@ -123,9 +127,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setupPoiClickListener() {
         map.setOnPoiClickListener {
-            Toast.makeText(this, it.name, Toast.LENGTH_LONG)
-                .show()
+            displayPlaceDetail(it)
         }
+    }
+
+    private fun displayPlaceDetail(pointOfInterest: PointOfInterest) {
+
+        val placeId = pointOfInterest.placeId
+
+        val placeFields = listOf(
+            Place.Field.ID,
+            Place.Field.NAME,
+            Place.Field.PHONE_NUMBER,
+            Place.Field.PHOTO_METADATAS,
+            Place.Field.ADDRESS,
+            Place.Field.LAT_LNG
+        )
+
+        val placeRequest = FetchPlaceRequest.builder(placeId, placeFields)
+            .build()
+
+        placesClient.fetchPlace(placeRequest)
+            .addOnSuccessListener { response ->
+                val place = response.place
+                val text = "${place.name}, ${place.phoneNumber}"
+                Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener {error ->
+                if (error is ApiException) {
+                    Timber.e("Place not found: ${error.message}, statusCode=${error.statusCode}")
+                }
+            }
+
     }
 
 }
