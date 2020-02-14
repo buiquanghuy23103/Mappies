@@ -1,6 +1,7 @@
 package com.huy.mappies.ui
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -43,4 +44,10 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             }
         })
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.bookmark_details_menu, menu)
+        return true
+    }
+
 }
