@@ -1,6 +1,7 @@
 package com.huy.mappies.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -285,6 +286,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun handleInfoWindowClick(marker: Marker) {
         when(marker.tag) {
+
             is PlaceInfo -> {
                 val placeInfo = marker.tag as PlaceInfo
                 if (placeInfo.place != null) {
@@ -293,11 +295,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             }
+
+            is BookmarkView -> {
+                val bookmarkView = marker.tag as BookmarkView
+                marker.hideInfoWindow()
+                bookmarkView.id?.let {
+                    startBookmarkDetailsActivity(it)
+                }
+            }
         }
         marker.remove()
     }
 
-
+    private fun startBookmarkDetailsActivity(bookmarkId: Long) {
+        val intent = Intent(this, BookmarkDetailsActivity::class.java)
+        startActivity(intent)
+    }
 
 
 }
