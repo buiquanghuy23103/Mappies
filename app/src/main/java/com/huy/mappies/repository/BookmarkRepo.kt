@@ -30,4 +30,10 @@ class BookmarkRepo @Inject constructor(
 
     fun getBookmarkView(id: Long) = bookmarkDao.getBookmarkView(id)
 
+    fun getBookmark(id: Long) = bookmarkDao.get(id)
+
+    fun updateBookmark(bookmark: Bookmark) {
+        bookmarkDao.update(bookmark)
+    }
+
 }
