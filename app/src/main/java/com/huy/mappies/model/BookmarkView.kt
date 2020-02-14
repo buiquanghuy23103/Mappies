@@ -9,7 +9,8 @@ data class BookmarkView(
     var latitude: Double = 0.0,
     var longtitude: Double = 0.0,
     var name: String = "",
-    var phone: String = ""
+    var phone: String = "",
+    var notes: String = ""
 ) {
     fun getImage(context: Context): Bitmap? {
         id?.let {
