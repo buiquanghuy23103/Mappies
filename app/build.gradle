@@ -49,4 +49,5 @@ dependencies {
     implementation "com.google.dagger:dagger:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
+    implementation 'com.google.android.material:material:1.2.0-alpha04'
 }
