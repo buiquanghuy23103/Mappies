@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.BookmarkDetailsActivity">
+
+    <item
+        android:id="@+id/bookmark_details_action_save"
+        android:icon="@drawable/ic_action_done"
+        android:title="@string/bookmark_details_menu_action_done_label"
+        app:showAsAction="ifRoom"/>
+
+</menu>
