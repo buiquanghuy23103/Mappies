@@ -284,11 +284,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun handleInfoWindowClick(marker: Marker) {
-        val placeInfo = marker.tag as PlaceInfo?
-        if (placeInfo != null) {
-            if (placeInfo.place != null) {
-                GlobalScope.launch {
-                    viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
+        when(marker.tag) {
+            is PlaceInfo -> {
+                val placeInfo = marker.tag as PlaceInfo
+                if (placeInfo.place != null) {
+                    GlobalScope.launch {
+                        viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
+                    }
                 }
             }
         }
