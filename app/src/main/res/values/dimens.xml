@@ -9,6 +9,8 @@
 
     <!--  padding specifics  -->
     <dimen name="padding_extreme_small">5dp</dimen>
+    <dimen name="padding_moderate">10dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
 
     <!--  margin specifics  -->
     <dimen name="margin_smallest">4dp</dimen>
@@ -18,4 +20,9 @@
     <!--  text size specifics  -->
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_slightly_small">12sp</dimen>
+
+    <!--  drawer specifics  -->
+    <dimen name="drawer_width">240dp</dimen>
+    <dimen name="drawer_header_view_height">150dp</dimen>
+
 </resources>

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Mappies</string>
     <string name="title_activity_maps">Map</string>
+    <string name="my_email">huythdnbkltv@gmail.com</string>
 
     <!--  Activity intent extra id  -->
     <string name="intent_extra_bookmark_id">bookmark_id</string>
