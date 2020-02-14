@@ -2,5 +2,17 @@
     <string name="app_name">Mappies</string>
     <string name="title_activity_maps">Map</string>
 
+    <!--  Activity intent extra id  -->
+    <string name="intent_extra_bookmark_id">bookmark_id</string>
+
     <string name="marker_image_content_description">Place image</string>
+
+    <!--  Bookmark detail activity  -->
+    <string name="bookmark_details_activity_label">Bookmark</string>
+    <string name="bookmark_details_menu_action_done_label">Done</string>
+    <string name="bookmark_details_name_label">Name</string>
+    <string name="bookmark_details_notes_label">Notes</string>
+    <string name="bookmark_details_phone_label">Phone</string>
+    <string name="bookmark_details_address_label">Address</string>
+
 </resources>

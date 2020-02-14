@@ -1,6 +1,7 @@
 package com.huy.mappies.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -24,10 +25,10 @@ import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
-import com.huy.mappies.adapter.MarkerInfoWindowAdapter
-import com.huy.mappies.getAppInjector
+import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
+import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -133,14 +134,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (location != null) {
 
                     val latLng = LatLng(location.latitude, location.longitude)
-                    val marker = MarkerOptions().position(latLng)
+                    val markerOptions = MarkerOptions().position(latLng)
                         .title("You are here")
                     val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
 
                     map.clear() // Remove previous marker
-                    map.addMarker(marker)
+                    map.addMarker(markerOptions)
                     map.moveCamera(cameraUpdate)
-
 
                 } else {
                     Timber.e("No location found")
@@ -181,19 +181,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupMapsListener() {
         setupInfoWindow()
         map.setOnPoiClickListener {
-            displayPlaceDetail(it)
+            handlePoiClick(it)
         }
         map.setOnInfoWindowClickListener {
             handleInfoWindowClick(it)
         }
     }
 
-    private fun displayPlaceDetail(pointOfInterest: PointOfInterest) {
+    private fun setupInfoWindow() {
+        val infoWindowAdapter = BookmarkInfoWindowAdapter.from(layoutInflater)
+        map.setInfoWindowAdapter(infoWindowAdapter)
+    }
+
+    private fun handlePoiClick(pointOfInterest: PointOfInterest) {
 
         placesClient.fetchPlace(getPlaceDetailRequest(pointOfInterest))
             .addOnSuccessListener { response ->
                 val place = response.place
-                displayPlacePhoto(place)
+                displayPlaceDetails(place)
             }
             .addOnFailureListener {error ->
                 if (error is ApiException) {
@@ -201,16 +206,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
 
-    }
-
-    private fun handleInfoWindowClick(marker: Marker) {
-        val placeInfo = marker.tag as PlaceInfo
-        if (placeInfo.place != null) {
-            GlobalScope.launch {
-                viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
-            }
-        }
-        marker.remove()
     }
 
     private fun getPlaceDetailRequest(pointOfInterest: PointOfInterest): FetchPlaceRequest {
@@ -229,24 +224,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .build()
     }
 
-    private fun displayPlacePhoto(place: Place) {
+    private fun displayPlaceDetails(place: Place) {
 
-        val photoMetadata: PhotoMetadata? = place.photoMetadatas?.get(0)
+        val photoRequest = getPhotoRequest(place)
 
-        if (photoMetadata == null) {
-            addPhotoToMarker(place, null)
+        if (photoRequest == null) {
+            addPlaceMarker(place, null)
             return
         } else {
-
-            val photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(resources.getDimensionPixelSize(R.dimen.default_image_width))
-                .setMaxHeight(resources.getDimensionPixelSize(R.dimen.default_image_height))
-                .build()
 
             placesClient.fetchPhoto(photoRequest)
                 .addOnSuccessListener { response ->
                     val bitmap = response.bitmap
-                    addPhotoToMarker(place, bitmap)
+                    addPlaceMarker(place, bitmap)
                 }
                 .addOnFailureListener {error ->
                     if (error is ApiException) {
@@ -256,26 +246,72 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
 
-
         }
 
     }
 
-    private fun addPhotoToMarker(place: Place, bitmap: Bitmap?) {
+    private fun getPhotoRequest(place: Place): FetchPhotoRequest? {
+        val photoMetadata: PhotoMetadata? = place.photoMetadatas?.get(0)
+        return if (photoMetadata == null) {
+            null
+        } else {
+            FetchPhotoRequest.builder(photoMetadata)
+                .setMaxWidth(resources.getDimensionPixelSize(R.dimen.default_image_width))
+                .setMaxHeight(resources.getDimensionPixelSize(R.dimen.default_image_height))
+                .build()
+        }
+    }
+
+    private fun addPlaceMarker(place: Place, bitmap: Bitmap?) {
+
+        val defaultMarkerIcon = BitmapDescriptorFactory.defaultMarker(
+            BitmapDescriptorFactory.HUE_AZURE
+        )
 
         val markerOptions = MarkerOptions()
             .position(place.latLng ?: LatLng(42.90237, -78.8704978))
             .title(place.name)
             .snippet(place.phoneNumber)
+            .icon(defaultMarkerIcon)
+            .alpha(0.08f)
 
         map.clear()
+
         val marker = map.addMarker(markerOptions)
         marker.tag = PlaceInfo(place, bitmap)
+
+
+        marker.showInfoWindow()
     }
 
-    private fun setupInfoWindow() {
-        val infoWindowAdapter = MarkerInfoWindowAdapter.from(layoutInflater)
-        map.setInfoWindowAdapter(infoWindowAdapter)
+    private fun handleInfoWindowClick(marker: Marker) {
+        when(marker.tag) {
+
+            is PlaceInfo -> {
+                val placeInfo = marker.tag as PlaceInfo
+                if (placeInfo.place != null) {
+                    GlobalScope.launch {
+                        viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
+                    }
+                }
+            }
+
+            is BookmarkView -> {
+                val bookmarkView = marker.tag as BookmarkView
+                marker.hideInfoWindow()
+                bookmarkView.id?.let {
+                    startBookmarkDetailsActivity(it)
+                }
+            }
+        }
+        marker.remove()
     }
+
+    private fun startBookmarkDetailsActivity(bookmarkId: Long) {
+        val intent = Intent(this, BookmarkDetailsActivity::class.java)
+            .putExtra(getString(R.string.intent_extra_bookmark_id), bookmarkId)
+        startActivity(intent)
+    }
+
 
 }

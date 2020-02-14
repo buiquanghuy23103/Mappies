@@ -8,7 +8,7 @@ import com.huy.mappies.model.Bookmark
 
 @Database(
     entities = [Bookmark::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class MappiesDatabase: RoomDatabase() {
@@ -22,7 +22,9 @@ abstract class MappiesDatabase: RoomDatabase() {
                 context.applicationContext,
                 MappiesDatabase::class.java,
                 "Mappies"
-            ).build()
+            )
+                .fallbackToDestructiveMigration()
+                .build()
 
 
         }

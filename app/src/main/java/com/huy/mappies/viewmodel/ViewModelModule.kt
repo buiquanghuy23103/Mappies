@@ -17,4 +17,9 @@ interface ViewModelModule {
     @ViewModelKey(MapsViewModel::class)
     fun mapsViewModel(mapsViewModel: MapsViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(BookmarkDetailsViewModel::class)
+    fun bookmarkDetailsViewModel(bookmarkDetailsViewModel: BookmarkDetailsViewModel): ViewModel
+
 }

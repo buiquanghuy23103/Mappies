@@ -18,9 +18,12 @@ interface BookmarkDao {
     fun get(id: Long): Bookmark
 
     @Query("SELECT * FROM bookmark WHERE id = :id")
+    fun getBookmarkView(id: Long): LiveData<BookmarkView>
+
+    @Query("SELECT * FROM bookmark WHERE id = :id")
     fun getLiveData(id: Long): Bookmark
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(marker: Bookmark)
 
     @Delete
