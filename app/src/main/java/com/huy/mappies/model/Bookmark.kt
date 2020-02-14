@@ -21,10 +21,8 @@ data class Bookmark(
 
     fun saveImage(image: Bitmap, context: Context) {
         id?.let {
-            ImageUtils.saveBitmapToFile(context, image, getImageFilename(it))
+            ImageUtils.saveBitmapToFile(context, image, ImageUtils.getImageFilename(it))
         }
     }
-
-    fun getImageFilename(id: Long) = "bookmark${id}.png"
 
 }

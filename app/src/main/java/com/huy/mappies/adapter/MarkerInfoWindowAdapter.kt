@@ -40,17 +40,19 @@ class MarkerInfoWindowAdapter private constructor(private val markerView: View)
     }
 
     private fun displayImage(marker: Marker?) {
+        val imageView = markerView.findViewById<ImageView>(R.id.marker_image)
+
         when(marker?.tag) {
 
             is PlaceInfo -> {
                 val placeInfo: PlaceInfo? = marker.tag as PlaceInfo
-                val imageView = markerView.findViewById<ImageView>(R.id.marker_image)
                 imageView.setImageBitmap(placeInfo?.image)
             }
 
             is BookmarkView -> {
                 val bookmarkView = marker.tag as BookmarkView
-                // TODO: set place image from bookmarkView
+                val bitmap = bookmarkView.getImage(markerView.context)
+                imageView.setImageBitmap(bitmap)
             }
 
         }
