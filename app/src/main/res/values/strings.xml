@@ -3,4 +3,11 @@
     <string name="title_activity_maps">Map</string>
 
     <string name="marker_image_content_description">Place image</string>
+
+    <!--  Bookmark detail activity  -->
+    <string name="bookmark_details_name_label">Name</string>
+    <string name="bookmark_details_notes_label">Notes</string>
+    <string name="bookmark_details_phone_label">Phone</string>
+    <string name="bookmark_details_address_label">Address</string>
+
 </resources>

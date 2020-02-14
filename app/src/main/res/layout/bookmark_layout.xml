@@ -16,7 +16,7 @@
             android:id="@+id/bookmark_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_extreme_small"
+            android:layout_marginEnd="@dimen/margin_smaller"
             android:adjustViewBounds="true"
             android:contentDescription="@string/marker_image_content_description"
             android:maxWidth="@dimen/marker_image_max_width"
