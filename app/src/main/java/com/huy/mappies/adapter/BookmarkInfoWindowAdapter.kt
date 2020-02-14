@@ -33,32 +33,29 @@ class BookmarkInfoWindowAdapter private constructor(private val binding: Bookmar
 
     override fun getInfoContents(marker: Marker?): View {
 
-        with(binding) {
-            bookmarkTitle.text = marker?.title
-            bookmarkSubtitle?.text = marker?.snippet
-        }
-
-        displayImage(marker)
-
-        return binding.root
-
-    }
-
-    private fun displayImage(marker: Marker?) {
         when(marker?.tag) {
 
             is PlaceInfo -> {
                 val placeInfo: PlaceInfo? = marker.tag as PlaceInfo
+                val place = placeInfo?.place
                 binding.bookmarkImage.setImageBitmap(placeInfo?.image)
+                binding.bookmarkTitle.text = place?.name
+                binding.bookmarkSubtitle.text = place?.phoneNumber
             }
 
             is BookmarkView -> {
                 val bookmarkView = marker.tag as BookmarkView
                 val bitmap = bookmarkView.getImage(binding.root.context)
                 binding.bookmarkImage.setImageBitmap(bitmap)
+                binding.bookmarkTitle.text = bookmarkView.name
+                binding.bookmarkSubtitle.text = bookmarkView.phone
             }
 
         }
+
+        return binding.root
+
     }
+
 
 }
