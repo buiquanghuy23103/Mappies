@@ -10,19 +10,19 @@ import com.huy.mappies.databinding.BookmarkLayoutBinding
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 
-class MarkerInfoWindowAdapter private constructor(private val binding: BookmarkLayoutBinding)
+class BookmarkInfoWindowAdapter private constructor(private val binding: BookmarkLayoutBinding)
     : GoogleMap.InfoWindowAdapter
 {
 
     companion object {
-        fun from(inflater: LayoutInflater): MarkerInfoWindowAdapter {
+        fun from(inflater: LayoutInflater): BookmarkInfoWindowAdapter {
             val binding: BookmarkLayoutBinding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.bookmark_layout,
                 null,
                 false
             )
-            return MarkerInfoWindowAdapter(binding)
+            return BookmarkInfoWindowAdapter(binding)
         }
     }
 

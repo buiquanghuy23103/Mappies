@@ -24,7 +24,7 @@ import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
-import com.huy.mappies.adapter.MarkerInfoWindowAdapter
+import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.utils.getAppInjector
@@ -276,7 +276,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupInfoWindow() {
-        val infoWindowAdapter = MarkerInfoWindowAdapter.from(layoutInflater)
+        val infoWindowAdapter = BookmarkInfoWindowAdapter.from(layoutInflater)
         map.setInfoWindowAdapter(infoWindowAdapter)
     }
 
