@@ -13,6 +13,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
+            android:id="@+id/bookmark_details_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
@@ -81,7 +82,7 @@
         <EditText
             android:id="@+id/bookmark_details_phone_edit_text"
             style="@style/BookmarkEditText"
-            android:inputType="text"
+            android:inputType="phone"
             android:hint="@string/bookmark_details_phone_label"/>
 
     </LinearLayout>
