@@ -28,4 +28,6 @@ class BookmarkRepo @Inject constructor(
 
     val allBookmarkViews = bookmarkDao.getAllBookmarkViews()
 
+    fun getBookmarkView(id: Long) = bookmarkDao.getBookmarkView(id)
+
 }

@@ -3,6 +3,7 @@ package com.huy.mappies.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.huy.mappies.R
@@ -30,5 +31,16 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             .get(BookmarkDetailsViewModel::class.java)
 
         setSupportActionBar(bookmark_details_toolbar)
+
+        setupFields()
+    }
+
+    private fun setupFields() {
+        val bookmarkId = intent.getLongExtra(getString(R.string.intent_extra_bookmark_id), 0)
+        viewModel.getBookmarkView(bookmarkId).observe(this, Observer {
+            it?.let {
+                binding.bookmarkView = it
+            }
+        })
     }
 }

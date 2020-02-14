@@ -3,16 +3,18 @@
 
     <data>
 
+        <variable
+            name="bookmarkView"
+            type="com.huy.mappies.model.BookmarkView" />
     </data>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:orientation="vertical">
 
             <com.google.android.material.appbar.AppBarLayout
@@ -35,9 +37,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="0dp"
+                android:adjustViewBounds="true"
                 android:maxHeight="@dimen/bookmark_details_image_max_height"
                 android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
                 android:src="@drawable/default_marker_image" />
 
             <LinearLayout
@@ -54,8 +56,9 @@
                 <EditText
                     android:id="@+id/bookmark_details_name_edit_text"
                     style="@style/BookmarkEditText"
+                    android:hint="@string/bookmark_details_name_label"
                     android:inputType="text"
-                    android:hint="@string/bookmark_details_name_label" />
+                    android:text="@{bookmarkView.name}"/>
 
             </LinearLayout>
 
@@ -73,8 +76,9 @@
                 <EditText
                     android:id="@+id/bookmark_details_notes_edit_text"
                     style="@style/BookmarkEditText"
+                    android:hint="@string/bookmark_details_notes_label"
                     android:inputType="text"
-                    android:hint="@string/bookmark_details_notes_label" />
+                    android:text="@{bookmarkView.notes}"/>
 
             </LinearLayout>
 
@@ -92,8 +96,9 @@
                 <EditText
                     android:id="@+id/bookmark_details_phone_edit_text"
                     style="@style/BookmarkEditText"
+                    android:hint="@string/bookmark_details_phone_label"
                     android:inputType="phone"
-                    android:hint="@string/bookmark_details_phone_label" />
+                    android:text="@{bookmarkView.phone}"/>
 
             </LinearLayout>
 
@@ -111,8 +116,9 @@
                 <EditText
                     android:id="@+id/bookmark_details_address_edit_text"
                     style="@style/BookmarkEditText"
+                    android:hint="@string/bookmark_details_address_label"
                     android:inputType="text"
-                    android:hint="@string/bookmark_details_address_label" />
+                    android:text="@{bookmarkView.address}"/>
 
             </LinearLayout>
 

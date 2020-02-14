@@ -8,6 +8,6 @@ class BookmarkDetailsViewModel @Inject constructor(
     private val bookmarkRepo: BookmarkRepo
 ): ViewModel() {
 
-
+    fun getBookmarkView(id: Long) = bookmarkRepo.getBookmarkView(id)
 
 }
