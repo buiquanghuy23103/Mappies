@@ -309,6 +309,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun startBookmarkDetailsActivity(bookmarkId: Long) {
         val intent = Intent(this, BookmarkDetailsActivity::class.java)
+            .putExtra(getString(R.string.intent_extra_bookmark_id), bookmarkId)
         startActivity(intent)
     }
 
