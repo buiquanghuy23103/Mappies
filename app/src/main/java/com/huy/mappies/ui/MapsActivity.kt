@@ -30,6 +30,7 @@ import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
+import kotlinx.android.synthetic.main.maps_main_view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -55,6 +56,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         getAppInjector().inject(this)
         setupViewModel()
+        setSupportActionBar(maps_toolbar)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
