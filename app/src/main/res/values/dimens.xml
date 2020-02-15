@@ -16,6 +16,7 @@
     <dimen name="margin_smallest">4dp</dimen>
     <dimen name="margin_smaller">5dp</dimen>
     <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
 
     <!--  text size specifics  -->
     <dimen name="text_size_small">14sp</dimen>
@@ -24,5 +25,7 @@
     <!--  drawer specifics  -->
     <dimen name="drawer_width">240dp</dimen>
     <dimen name="drawer_header_view_height">150dp</dimen>
+    <dimen name="drawer_item_icon_width">30dp</dimen>
+    <dimen name="drawer_item_icon_height">30dp</dimen>
 
 </resources>
