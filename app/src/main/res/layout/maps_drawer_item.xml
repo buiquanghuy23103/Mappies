@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
-    android:paddingTop="@dimen/padding_moderate"
-    android:paddingBottom="@dimen/padding_moderate"
-    android:paddingStart="@dimen/padding_medium"
-    android:paddingEnd="@dimen/padding_medium">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <ImageView
-        android:id="@+id/drawer_item_icon"
-        android:layout_width="@dimen/drawer_item_icon_width"
-        android:layout_height="@dimen/drawer_item_icon_height"
-        android:layout_marginEnd="@dimen/margin_medium"
-        android:adjustViewBounds="true"
-        android:scaleType="fitStart"
-        tools:src="@mipmap/ic_launcher_round"/>
+    <data>
+        <variable
+            name="bookmarkView"
+            type="com.huy.mappies.model.BookmarkView" />
+    </data>
 
-    <TextView
-        android:id="@+id/drawer_item_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        tools:text="Restaurant"/>
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/padding_moderate"
+        android:paddingBottom="@dimen/padding_moderate"
+        android:paddingStart="@dimen/padding_medium"
+        android:paddingEnd="@dimen/padding_medium">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/drawer_item_icon"
+            android:layout_width="@dimen/drawer_item_icon_width"
+            android:layout_height="@dimen/drawer_item_icon_height"
+            android:layout_marginEnd="@dimen/margin_medium"
+            android:adjustViewBounds="true"
+            android:scaleType="fitStart"
+            tools:src="@mipmap/ic_launcher_round" />
+
+        <TextView
+            android:id="@+id/drawer_item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@{bookmarkView.name}"
+            tools:text="Restaurant" />
+
+    </LinearLayout>
+</layout>

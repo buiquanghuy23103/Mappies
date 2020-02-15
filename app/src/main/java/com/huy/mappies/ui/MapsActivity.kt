@@ -27,11 +27,13 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
 import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
+import com.huy.mappies.adapter.DrawerItemListAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.android.synthetic.main.activity_maps.*
+import kotlinx.android.synthetic.main.maps_drawer_view.*
 import kotlinx.android.synthetic.main.maps_main_view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -59,13 +61,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         getAppInjector().inject(this)
         setupViewModel()
         setupToolbar()
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        setupDrawerToggleIcon()
+        setupMapView()
         setupLocationClient()
         setupPlacesClient()
+        setupDrawer()
     }
+
 
     private fun setupViewModel() {
         viewModel = ViewModelProviders.of(this, viewModelFactory)
@@ -73,9 +75,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupToolbar() {
-
         setSupportActionBar(maps_toolbar)
+    }
 
+    private fun setupDrawerToggleIcon() {
         val toggle = ActionBarDrawerToggle(
             this,
             maps_drawer_layout,
@@ -85,6 +88,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         )
 
         toggle.syncState()
+    }
+
+    private fun setupDrawer() {
+        val adapter = DrawerItemListAdapter()
+        drawerRecyclerView.adapter = adapter
+        viewModel.allBookmarkViews.observe(this, Observer {
+            adapter.submitList(it)
+        })
+    }
+
+    private fun setupMapView() {
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
