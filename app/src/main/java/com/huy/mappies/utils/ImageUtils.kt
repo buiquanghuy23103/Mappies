@@ -3,11 +3,23 @@ package com.huy.mappies.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Environment
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 object ImageUtils {
+
+    @Throws(IOException::class)
+    fun getImageFilename(context: Context): File {
+        val timeStamp = SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(Date())
+        val filename = "Mappies_${timeStamp}_"
+        val filesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(filename, ".jpg", filesDir)
+    }
 
     fun getImageFilename(id: Long) = "bookmark${id}.png"
 
