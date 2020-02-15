@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.LongSparseArray
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
@@ -26,16 +28,20 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
 import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
+import com.huy.mappies.adapter.DrawerItemListAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
+import kotlinx.android.synthetic.main.activity_maps.*
+import kotlinx.android.synthetic.main.maps_drawer_view.*
+import kotlinx.android.synthetic.main.maps_main_view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdapter.OnDrawerItemClick {
 
     companion object {
         private const val REQUEST_LOCATION = 1
@@ -49,23 +55,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var placesClient: PlacesClient
     private lateinit var viewModel: MapsViewModel
+    private val markers = LongSparseArray<Marker>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         getAppInjector().inject(this)
         setupViewModel()
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        setupToolbar()
+        setupDrawerToggleIcon()
+        setupMapView()
         setupLocationClient()
         setupPlacesClient()
-    }
-
-    private fun setupViewModel() {
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(MapsViewModel::class.java)
+        setupDrawer()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -74,6 +76,44 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         observeBookmarkViews()
         getCurrentLocation()
     }
+
+    private fun setupViewModel() {
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+            .get(MapsViewModel::class.java)
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(maps_toolbar)
+    }
+
+    private fun setupDrawerToggleIcon() {
+        val toggle = ActionBarDrawerToggle(
+            this,
+            maps_drawer_layout,
+            maps_toolbar,
+            R.string.open_drawer,
+            R.string.close_drawer
+        )
+
+        toggle.syncState()
+    }
+
+    private fun setupDrawer() {
+        val adapter = DrawerItemListAdapter(this)
+        drawerRecyclerView.adapter = adapter
+        viewModel.allBookmarkViews.observe(this, Observer {
+            adapter.submitList(it)
+        })
+    }
+
+    private fun setupMapView() {
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+    }
+
+
 
     private fun setupLocationClient() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -88,11 +128,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun observeBookmarkViews() {
 
         viewModel.allBookmarkViews.observe(this, Observer {
+            markers.clear()
             map.clear()
             it?.let {
                 it.forEach(this::displayBookmark)
             }
         })
+
+    }
+
+    override fun handleDrawerItemClick(bookmarkView: BookmarkView) {
+
+        maps_drawer_layout.closeDrawer(drawerView)
+
+        val marker = bookmarkView.id?.let { markers[it] }
+        marker?.showInfoWindow()
+
+        val newLocation = LatLng(bookmarkView.latitude, bookmarkView.longtitude)
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(newLocation, 16.0f)
+        map.animateCamera(cameraUpdate)
 
     }
 
@@ -108,6 +162,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val marker = map.addMarker(markerOptions)
         marker.tag = bookmarkView
+
+        bookmarkView.id?.let {
+            markers.append(it, marker)
+        }
+
     }
 
     private fun getCurrentLocation() {

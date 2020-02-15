@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Mappies</string>
     <string name="title_activity_maps">Map</string>
+    <string name="my_email">huythdnbkltv@gmail.com</string>
 
     <!--  Activity intent extra id  -->
     <string name="intent_extra_bookmark_id">bookmark_id</string>
@@ -14,5 +15,9 @@
     <string name="bookmark_details_notes_label">Notes</string>
     <string name="bookmark_details_phone_label">Phone</string>
     <string name="bookmark_details_address_label">Address</string>
+
+    <!--  drawer view  -->
+    <string name="open_drawer">Open Drawer</string>
+    <string name="close_drawer">Close Drawer</string>
 
 </resources>
