@@ -15,7 +15,7 @@ class MapsViewModel @Inject constructor(
 
     val allBookmarkViews = bookmarkRepo.allBookmarkViews
 
-    fun addBookmarkFromPlace(place: Place, image: Bitmap?) {
+    suspend fun addBookmarkFromPlace(place: Place, image: Bitmap?) {
 
         val bookmark = bookmarkRepo.createBookmark(place)
         val newId = bookmarkRepo.addBookmark(bookmark)

@@ -9,7 +9,7 @@ class BookmarkRepo @Inject constructor(
     private val bookmarkDao: BookmarkDao
 ) {
 
-    fun addBookmark(bookmark: Bookmark): Long? {
+    suspend fun addBookmark(bookmark: Bookmark): Long? {
         val findBookmarkInDb = bookmark.placeId?.let { bookmarkDao.get(it) }
         return if (findBookmarkInDb == null) {
             val newId = bookmarkDao.insert(bookmark)
@@ -37,9 +37,9 @@ class BookmarkRepo @Inject constructor(
 
     fun getBookmarkView(id: Long) = bookmarkDao.getBookmarkView(id)
 
-    fun getBookmark(id: Long) = bookmarkDao.get(id)
+    suspend fun getBookmark(id: Long) = bookmarkDao.get(id)
 
-    fun updateBookmark(bookmark: Bookmark) {
+    suspend fun updateBookmark(bookmark: Bookmark) {
         bookmarkDao.update(bookmark)
     }
 

@@ -22,7 +22,7 @@ class BookmarkDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun getBookmarkFromBookmarkView(bookmarkView: BookmarkView): Bookmark? {
+    private suspend fun getBookmarkFromBookmarkView(bookmarkView: BookmarkView): Bookmark? {
 
         // Load the original bookmark from db to retain the values that aren't updated by
         // the bookmarkView
