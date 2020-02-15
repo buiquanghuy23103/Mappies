@@ -10,7 +10,7 @@ import com.huy.mappies.R
 import com.huy.mappies.databinding.MapsDrawerItemBinding
 import com.huy.mappies.model.BookmarkView
 
-class DrawerItemListAdapter
+class DrawerItemListAdapter(private val onDrawerItemClick: OnDrawerItemClick)
     : ListAdapter<BookmarkView, DrawerItemListAdapter.DrawerItem>(diffCallback) {
 
     companion object {
@@ -26,7 +26,7 @@ class DrawerItemListAdapter
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrawerItem {
-        return DrawerItem.from(parent)
+        return DrawerItem.from(parent, onDrawerItemClick)
     }
 
     override fun onBindViewHolder(holder: DrawerItem, position: Int) {
@@ -34,12 +34,14 @@ class DrawerItemListAdapter
         holder.bind(item)
     }
 
-    class DrawerItem private constructor(private val binding: MapsDrawerItemBinding)
-        : RecyclerView.ViewHolder(binding.root)
+    class DrawerItem private constructor(
+        private val binding: MapsDrawerItemBinding,
+        private val onDrawerItemClick: OnDrawerItemClick
+    ) : RecyclerView.ViewHolder(binding.root)
     {
 
         companion object {
-            fun from(viewGroup: ViewGroup): DrawerItem {
+            fun from(viewGroup: ViewGroup, onDrawerItemClick: OnDrawerItemClick): DrawerItem {
 
                 val inflater = LayoutInflater.from(viewGroup.context)
 
@@ -50,13 +52,21 @@ class DrawerItemListAdapter
                     false
                 )
 
-                return DrawerItem(binding)
+                return DrawerItem(binding, onDrawerItemClick)
             }
         }
 
         fun bind(bookmarkView: BookmarkView) {
             binding.bookmarkView = bookmarkView
+            binding.root.setOnClickListener {
+                onDrawerItemClick.handleDrawerItemClick(bookmarkView)
+            }
         }
 
     }
+
+    interface OnDrawerItemClick {
+        fun handleDrawerItemClick(bookmarkView: BookmarkView)
+    }
+
 }
