@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.huy.mappies.R
 import com.huy.mappies.databinding.ActivityBookmarkDetailsBinding
 import com.huy.mappies.model.BookmarkView
@@ -57,6 +58,23 @@ class BookmarkDetailsActivity : AppCompatActivity() {
         }
         val placeImage = ImageUtils.loadBitmapFromFile(this, imageFilename)
         binding.bookmarkDetailsPlaceImageView.setImageBitmap(placeImage)
+        binding.bookmarkDetailsPlaceImageView.setOnClickListener {
+            showPhotoOptionDialog()
+        }
+    }
+
+    private fun showPhotoOptionDialog() {
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.photo_dialog_title)
+            .setOnCancelListener { dialog -> dialog.dismiss() }
+            .setItems(R.array.photo_dialog_options) { dialog, itemId ->
+                when(itemId) {
+                    1 -> {}
+                    2 -> {}
+                }
+            }
+            .show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

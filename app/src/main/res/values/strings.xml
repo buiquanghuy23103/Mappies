@@ -16,6 +16,14 @@
     <string name="bookmark_details_phone_label">Phone</string>
     <string name="bookmark_details_address_label">Address</string>
 
+    <!--  Photo dialog  -->
+    <string name="photo_dialog_title">Photo option</string>
+    <string-array name="photo_dialog_options">
+        <item name="photo_dialog_option_camera">Camera</item>
+        <item name="photo_dialog_option_gallery">Gallery</item>
+    </string-array>
+
+
     <!--  drawer view  -->
     <string name="open_drawer">Open Drawer</string>
     <string name="close_drawer">Close Drawer</string>
