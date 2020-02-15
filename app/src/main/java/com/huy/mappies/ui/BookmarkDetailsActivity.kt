@@ -1,13 +1,14 @@
 package com.huy.mappies.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +20,7 @@ import com.huy.mappies.databinding.ActivityBookmarkDetailsBinding
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.utils.ImageUtils
 import com.huy.mappies.utils.getAppInjector
+import com.huy.mappies.utils.getUri
 import com.huy.mappies.viewmodel.BookmarkDetailsViewModel
 import kotlinx.android.synthetic.main.activity_bookmark_details.*
 import timber.log.Timber
@@ -100,10 +102,7 @@ class BookmarkDetailsActivity : AppCompatActivity() {
 
         photoFile?.also {
 
-            val photoUri = FileProvider.getUriForFile(
-                this,
-                "com.huy.mappies.fileprovider",
-                it)
+            val photoUri = it.getUri(this)
 
             val captureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 .putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
@@ -154,6 +153,40 @@ class BookmarkDetailsActivity : AppCompatActivity() {
         finish()
 
         return true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+
+            when (requestCode) {
+                REQUEST_CAPTURE_IMAGE -> {
+                    saveImage()
+                }
+            }
+
+        }
+    }
+
+    private fun saveImage() {
+
+        photoFile?.let { file ->
+            val uri = file.getUri(this)
+            revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            val image = getImageWithPath(file.absolutePath)
+            bookmarkView?.let {bookmark ->
+                val imageFilename = bookmark.id?.let { ImageUtils.getImageFilename(it) }
+                ImageUtils.saveBitmapToFile(this, image, imageFilename)
+                binding.bookmarkDetailsPlaceImageView.setImageBitmap(image)
+            }
+        }
+
+    }
+
+    private fun getImageWithPath(filePath: String): Bitmap {
+        val defaultWidth = resources.getDimensionPixelSize(R.dimen.default_image_width)
+        val defaultHeight = resources.getDimensionPixelSize(R.dimen.default_image_height)
+        return ImageUtils.decodeFileToSize(filePath, defaultWidth, defaultHeight)
     }
 
     companion object {

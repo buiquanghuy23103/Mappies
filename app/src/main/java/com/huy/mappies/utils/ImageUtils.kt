@@ -13,6 +13,45 @@ import java.util.*
 
 object ImageUtils {
 
+    fun decodeFileToSize(filePath: String, width: Int, height: Int): Bitmap {
+        val options = BitmapFactory.Options()
+
+        // just load the size, not the actual image
+        options.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(filePath, options)
+
+        // set new size
+        options.inSampleSize = calculateInSampleSize(
+            options.outWidth, options.outHeight, width, height
+        )
+
+        // load the actual image
+        options.inJustDecodeBounds = false
+
+        return BitmapFactory.decodeFile(filePath, options)
+    }
+
+    private fun calculateInSampleSize(width: Int, height: Int, reqWidth: Int, reqHeight: Int): Int {
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+
+            while (excessive(height, reqHeight, inSampleSize)
+                && excessive(width, reqWidth, inSampleSize))
+            {
+                inSampleSize *= 2
+            }
+
+        }
+
+        return inSampleSize
+
+    }
+
+    private fun excessive(size: Int, reqSize: Int, inSampleSize: Int): Boolean {
+        return (size / 2) / inSampleSize >= reqSize
+    }
+
     @Throws(IOException::class)
     fun getImageFilename(context: Context): File {
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(Date())
@@ -29,7 +68,9 @@ object ImageUtils {
         return BitmapFactory.decodeFile(filePath)
     }
 
-    fun saveBitmapToFile(context: Context, bitmap: Bitmap, filename: String) {
+    fun saveBitmapToFile(context: Context, bitmap: Bitmap, filename: String?) {
+
+        if (filename == null) return
 
         val bytes = getByteArrayFromBitmap(bitmap)
 
