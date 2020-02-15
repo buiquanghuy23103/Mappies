@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
@@ -30,6 +31,7 @@ import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
+import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.maps_main_view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -56,7 +58,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         getAppInjector().inject(this)
         setupViewModel()
-        setSupportActionBar(maps_toolbar)
+        setupToolbar()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -68,6 +70,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupViewModel() {
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(MapsViewModel::class.java)
+    }
+
+    private fun setupToolbar() {
+
+        setSupportActionBar(maps_toolbar)
+
+        val toggle = ActionBarDrawerToggle(
+            this,
+            maps_drawer_layout,
+            maps_toolbar,
+            R.string.open_drawer,
+            R.string.close_drawer
+        )
+
+        toggle.syncState()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

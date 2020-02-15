@@ -16,4 +16,8 @@
     <string name="bookmark_details_phone_label">Phone</string>
     <string name="bookmark_details_address_label">Address</string>
 
+    <!--  drawer view  -->
+    <string name="open_drawer">Open Drawer</string>
+    <string name="close_drawer">Close Drawer</string>
+
 </resources>
