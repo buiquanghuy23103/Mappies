@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
@@ -14,7 +15,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.huy.mappies.R
 import com.huy.mappies.databinding.ActivityBookmarkDetailsBinding
 import com.huy.mappies.model.BookmarkView
@@ -81,17 +81,14 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             .setOnCancelListener { dialog -> dialog.dismiss() }
             .setItems(R.array.photo_dialog_options) { dialog, itemId ->
                 when(itemId) {
-                    0 -> startCapturingPictures()
-                    1 -> {
-                        Snackbar.make(binding.bookmarkDetailsPlaceImageView, "Gallery", Snackbar.LENGTH_LONG)
-                            .show()
-                    }
+                    0 -> capturePictures()
+                    1 -> startPickingPictures()
                 }
             }
             .show()
     }
 
-    private fun startCapturingPictures() {
+    private fun capturePictures() {
         photoFile = null
 
         try {
@@ -122,6 +119,11 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             startActivityForResult(captureIntent, REQUEST_CAPTURE_IMAGE)
         }
 
+    }
+
+    private fun startPickingPictures() {
+        val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(pickIntent, REQUEST_GALLERY_IMAGE)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -163,6 +165,10 @@ class BookmarkDetailsActivity : AppCompatActivity() {
                 REQUEST_CAPTURE_IMAGE -> {
                     saveImage()
                 }
+                REQUEST_GALLERY_IMAGE -> if (data != null && data.data != null) {
+                    val imageUri = data.data
+                    imageUri?.let { saveImage(imageUri) }
+                }
             }
 
         }
@@ -174,14 +180,19 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             val uri = file.getUri(this)
             revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             val image = getImageWithPath(file.absolutePath)
-            bookmarkView?.let {bookmark ->
-                val imageFilename = bookmark.id?.let { ImageUtils.getImageFilename(it) }
-                ImageUtils.saveBitmapToFile(this, image, imageFilename)
-                binding.bookmarkDetailsPlaceImageView.setImageBitmap(image)
-            }
+            updateImage(image)
         }
 
     }
+
+    private fun updateImage(image: Bitmap) {
+        bookmarkView?.let { bookmark ->
+            val imageFilename = bookmark.id?.let { ImageUtils.getImageFilename(it) }
+            ImageUtils.saveBitmapToFile(this, image, imageFilename)
+            binding.bookmarkDetailsPlaceImageView.setImageBitmap(image)
+        }
+    }
+
 
     private fun getImageWithPath(filePath: String): Bitmap {
         val defaultWidth = resources.getDimensionPixelSize(R.dimen.default_image_width)
@@ -189,8 +200,20 @@ class BookmarkDetailsActivity : AppCompatActivity() {
         return ImageUtils.decodeFileToSize(filePath, defaultWidth, defaultHeight)
     }
 
+    private fun saveImage(uri: Uri) {
+        val image = getImageWithUri(uri)
+        image?.let { updateImage(image) }
+    }
+
+    private fun getImageWithUri(uri: Uri): Bitmap? {
+        val defaultWidth = resources.getDimensionPixelSize(R.dimen.default_image_width)
+        val defaultHeight = resources.getDimensionPixelSize(R.dimen.default_image_height)
+        return ImageUtils.decodeUriStreamToSize(this, uri, defaultWidth, defaultHeight)
+    }
+
     companion object {
         private const val REQUEST_CAPTURE_IMAGE = 1
+        private const val REQUEST_GALLERY_IMAGE = 2
     }
 
 }

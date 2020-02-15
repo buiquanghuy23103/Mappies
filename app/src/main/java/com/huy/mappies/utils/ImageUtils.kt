@@ -3,20 +3,71 @@ package com.huy.mappies.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Environment
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
 object ImageUtils {
 
+    fun decodeUriStreamToSize(context: Context, uri: Uri, width: Int, height: Int): Bitmap? {
+
+        var inputStream: InputStream? = null
+
+        try {
+            inputStream = context.contentResolver.openInputStream(uri)
+
+            if (inputStream != null) {
+
+                val options = BitmapFactory.Options()
+
+                // just load the size to "options" variable, so we turn the "inJustDecodeBounds" on
+                options.inJustDecodeBounds = true
+                BitmapFactory.decodeStream(inputStream, null, options)
+                inputStream.close()
+
+                // load the actual image to inputStream
+                inputStream = context.contentResolver.openInputStream(uri)
+                if (inputStream != null) {
+
+                    // set new size
+                    options.inSampleSize = calculateInSampleSize(
+                        options.outWidth, options.outHeight,
+                        width, height
+                    )
+
+                    // now we want to load the actual image so turn the "inJustDecodeBounds" off
+                    options.inJustDecodeBounds = false
+
+                    val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+                    inputStream.close()
+
+                    return bitmap
+
+                }
+
+            }
+
+            return null
+        } catch (error: IOException) {
+            Timber.e(error)
+        } finally {
+            inputStream?.close()
+        }
+
+        return null
+
+    }
+
     fun decodeFileToSize(filePath: String, width: Int, height: Int): Bitmap {
         val options = BitmapFactory.Options()
 
-        // just load the size, not the actual image
+        // just load the size to "options" variable, not the actual image
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(filePath, options)
 
