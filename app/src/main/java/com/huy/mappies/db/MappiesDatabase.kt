@@ -8,7 +8,7 @@ import com.huy.mappies.model.Bookmark
 
 @Database(
     entities = [Bookmark::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class MappiesDatabase: RoomDatabase() {
