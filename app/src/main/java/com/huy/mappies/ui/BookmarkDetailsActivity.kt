@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.huy.mappies.R
 import com.huy.mappies.databinding.ActivityBookmarkDetailsBinding
 import com.huy.mappies.model.BookmarkView
+import com.huy.mappies.utils.ImageUtils
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.BookmarkDetailsViewModel
 import kotlinx.android.synthetic.main.activity_bookmark_details.*
@@ -45,8 +46,17 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             it?.let {
                 binding.bookmarkView = it
                 bookmarkView = it
+                inflatePlaceImage()
             }
         })
+    }
+
+    private fun inflatePlaceImage() {
+        val imageFilename = bookmarkView?.id?.let { bookmarkViewId ->
+            ImageUtils.getImageFilename(bookmarkViewId)
+        }
+        val placeImage = ImageUtils.loadBitmapFromFile(this, imageFilename)
+        binding.bookmarkDetailsPlaceImageView.setImageBitmap(placeImage)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

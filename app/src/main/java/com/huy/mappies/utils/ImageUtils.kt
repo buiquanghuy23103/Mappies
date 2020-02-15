@@ -11,7 +11,8 @@ object ImageUtils {
 
     fun getImageFilename(id: Long) = "bookmark${id}.png"
 
-    fun loadBitmapFromFile(context: Context, filename: String): Bitmap? {
+    fun loadBitmapFromFile(context: Context, filename: String?): Bitmap? {
+        if (filename == null) return null
         val filePath = File(context.filesDir, filename).absolutePath
         return BitmapFactory.decodeFile(filePath)
     }
