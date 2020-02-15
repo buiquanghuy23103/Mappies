@@ -11,8 +11,11 @@ interface BookmarkDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(marker: Bookmark): Long
 
-    @Query("SELECT * FROM bookmark")
+    @Query("SELECT * FROM bookmark ORDER BY name")
     fun getAllBookmarkViews(): LiveData<List<BookmarkView>>
+
+    @Query("SELECT * FROM bookmark WHERE placeId = :placeId")
+    fun get(placeId: String): Bookmark
 
     @Query("SELECT * FROM bookmark WHERE id = :id")
     fun get(id: Long): Bookmark
@@ -24,9 +27,9 @@ interface BookmarkDao {
     fun getLiveData(id: Long): Bookmark
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(marker: Bookmark)
+    fun update(bookmark: Bookmark)
 
     @Delete
-    fun delete(marker: Bookmark)
+    fun delete(bookmark: Bookmark)
 
 }

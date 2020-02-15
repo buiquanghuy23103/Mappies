@@ -10,9 +10,16 @@ class BookmarkRepo @Inject constructor(
 ) {
 
     fun addBookmark(bookmark: Bookmark): Long? {
-        val newId = bookmarkDao.insert(bookmark)
-        bookmark.id = newId
-        return newId
+        val findBookmarkInDb = bookmark.placeId?.let { bookmarkDao.get(it) }
+        return if (findBookmarkInDb == null) {
+            val newId = bookmarkDao.insert(bookmark)
+            bookmark.id = newId
+            newId
+        } else {
+            bookmark.id = findBookmarkInDb.id
+            bookmarkDao.update(bookmark)
+            bookmark.id
+        }
     }
 
     fun createBookmark(place: Place): Bookmark {
