@@ -276,7 +276,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
             Place.Field.PHONE_NUMBER,
             Place.Field.PHOTO_METADATAS,
             Place.Field.ADDRESS,
-            Place.Field.LAT_LNG
+            Place.Field.LAT_LNG,
+            Place.Field.TYPES
         )
 
         return FetchPlaceRequest.builder(placeId, placeFields)
