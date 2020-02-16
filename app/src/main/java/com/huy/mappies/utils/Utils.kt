@@ -1,8 +1,10 @@
 package com.huy.mappies.utils
 
+import android.content.Context
 import com.google.android.libraries.places.api.model.Place
 import com.huy.mappies.MainApplication
 import com.huy.mappies.R
+import java.io.File
 
 fun getAppInjector() = MainApplication.get().component
 
@@ -41,3 +43,11 @@ val categoryToIconMap = hashMapOf(
     LODGING to R.drawable.ic_lodging,
     OTHER to R.drawable.ic_other
 )
+
+suspend fun deleteFile(context: Context, filename: String?) {
+    filename?.let {
+        val dir = context.filesDir
+        val file = File(dir, filename)
+        file.delete()
+    }
+}
