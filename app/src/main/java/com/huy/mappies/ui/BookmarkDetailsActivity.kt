@@ -197,6 +197,7 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             notes = bookmark_details_notes_edit_text.text.toString()
             address = bookmark_details_address_edit_text.text.toString()
             phone = bookmark_details_phone_edit_text.text.toString()
+            category = bookmark_details_category_spinner.selectedItem as String
         }
 
         viewModel.updateBookmark(newBookmarkView)

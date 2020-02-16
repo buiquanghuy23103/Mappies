@@ -36,6 +36,7 @@ class BookmarkDetailsViewModel @Inject constructor(
             phone = bookmarkView.phone
             address = bookmarkView.address
             notes = bookmarkView.notes
+            category = bookmarkView.category
         }
 
     }
