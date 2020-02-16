@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.huy.mappies.R
 import com.huy.mappies.databinding.MapsDrawerItemBinding
 import com.huy.mappies.model.BookmarkView
-import com.huy.mappies.utils.buildCategoryToIconMap
+import com.huy.mappies.utils.categoryToIconMap
 import timber.log.Timber
 
 class DrawerItemListAdapter(private val onDrawerItemClick: OnDrawerItemClick)
@@ -41,10 +41,6 @@ class DrawerItemListAdapter(private val onDrawerItemClick: OnDrawerItemClick)
         private val onDrawerItemClick: OnDrawerItemClick
     ) : RecyclerView.ViewHolder(binding.root)
     {
-        private val categoryToIconMap = buildCategoryToIconMap()
-
-
-
         companion object {
             fun from(viewGroup: ViewGroup, onDrawerItemClick: OnDrawerItemClick): DrawerItem {
 

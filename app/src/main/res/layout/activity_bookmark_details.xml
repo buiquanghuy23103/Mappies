@@ -88,7 +88,7 @@
                     android:layout_weight="1.4"
                     android:layout_marginTop="@dimen/margin_medium"
                     android:layout_marginEnd="@dimen/margin_small"
-                    android:layout_marginStart="@dimen/margin_small"/>
+                    android:layout_marginStart="@dimen/margin_small" />
 
             </LinearLayout>
 

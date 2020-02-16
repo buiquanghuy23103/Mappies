@@ -6,7 +6,12 @@ import com.huy.mappies.R
 
 fun getAppInjector() = MainApplication.get().component
 
-fun buildPlaceTypeToCategoryMap() = hashMapOf(
+
+val categories = listOf(
+    RESTAURANT, LODGING, SHOPPING, OTHER, GAS
+)
+
+val placeTypeToCategoryMap = hashMapOf(
     Place.Type.BAKERY to RESTAURANT,
     Place.Type.BAR to RESTAURANT,
     Place.Type.CAFE to RESTAURANT,
@@ -29,7 +34,7 @@ fun buildPlaceTypeToCategoryMap() = hashMapOf(
     Place.Type.LODGING to LODGING
 )
 
-fun buildCategoryToIconMap() = hashMapOf(
+val categoryToIconMap = hashMapOf(
     RESTAURANT to R.drawable.ic_restaurant,
     GAS to R.drawable.ic_gas,
     SHOPPING to R.drawable.ic_shopping,

@@ -4,15 +4,13 @@ import com.google.android.libraries.places.api.model.Place
 import com.huy.mappies.db.BookmarkDao
 import com.huy.mappies.model.Bookmark
 import com.huy.mappies.utils.OTHER
-import com.huy.mappies.utils.buildPlaceTypeToCategoryMap
+import com.huy.mappies.utils.placeTypeToCategoryMap
 import timber.log.Timber
 import javax.inject.Inject
 
 class BookmarkRepo @Inject constructor(
     private val bookmarkDao: BookmarkDao
 ) {
-
-    private val placeTypeToCategoryMap = buildPlaceTypeToCategoryMap()
 
     suspend fun insertBookmarkToDb(bookmark: Bookmark): Long? {
         val findBookmarkInDb = bookmark.placeId?.let { bookmarkDao.get(it) }

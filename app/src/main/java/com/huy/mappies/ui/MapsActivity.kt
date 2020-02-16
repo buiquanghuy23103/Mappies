@@ -31,7 +31,7 @@ import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
 import com.huy.mappies.adapter.DrawerItemListAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
-import com.huy.mappies.utils.buildCategoryToIconMap
+import com.huy.mappies.utils.categoryToIconMap
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.android.synthetic.main.activity_maps.*
@@ -152,7 +152,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
     }
 
     private fun addPlaceMarker(bookmarkView: BookmarkView) {
-        val categoryToIconMap = buildCategoryToIconMap()
         val iconResId = categoryToIconMap[bookmarkView.category]
         val icon = iconResId?.let { BitmapDescriptorFactory.fromResource(iconResId) }
 

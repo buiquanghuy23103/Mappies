@@ -1,7 +1,7 @@
 package com.huy.mappies.utils
 
-const val RESTAURANT = "restaurant"
-const val GAS = "gas"
-const val SHOPPING = "shopping"
-const val LODGING = "lodging"
-const val OTHER = "other"
+const val RESTAURANT = "Restaurant"
+const val GAS = "Gas"
+const val SHOPPING = "Shopping"
+const val LODGING = "Lodging"
+const val OTHER = "Other"
