@@ -31,6 +31,7 @@ import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
 import com.huy.mappies.adapter.DrawerItemListAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
+import com.huy.mappies.utils.buildCategoryToIconMap
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.android.synthetic.main.activity_maps.*
@@ -131,7 +132,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
             markers.clear()
             map.clear()
             it?.let {
-                it.forEach(this::displayBookmark)
+                it.forEach(this::addPlaceMarker)
             }
         })
 
@@ -150,14 +151,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
 
     }
 
-    private fun displayBookmark(bookmarkView: BookmarkView) {
-        val defaultMarkerIcon = BitmapDescriptorFactory.defaultMarker(
-            BitmapDescriptorFactory.HUE_AZURE
-        )
+    private fun addPlaceMarker(bookmarkView: BookmarkView) {
+        val categoryToIconMap = buildCategoryToIconMap()
+        val iconResId = categoryToIconMap[bookmarkView.category]
+        val icon = iconResId?.let { BitmapDescriptorFactory.fromResource(iconResId) }
 
         val markerOptions = MarkerOptions()
             .position(LatLng(bookmarkView.latitude, bookmarkView.longtitude))
-            .icon(defaultMarkerIcon)
+            .title(bookmarkView.name)
+            .snippet(bookmarkView.phone)
+            .icon(icon)
             .alpha(0.8f)
 
         val marker = map.addMarker(markerOptions)
