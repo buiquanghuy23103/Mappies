@@ -10,4 +10,8 @@
         android:title="@string/bookmark_details_menu_action_done_label"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/bookmark_details_action_delete"
+        android:icon=""
+
 </menu>
