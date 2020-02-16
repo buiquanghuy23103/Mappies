@@ -28,4 +28,8 @@
     <dimen name="drawer_item_icon_width">30dp</dimen>
     <dimen name="drawer_item_icon_height">30dp</dimen>
 
+    <!--  bookmark details specifics  -->
+    <dimen name="category_icon_width">24dp</dimen>
+    <dimen name="category_icon_height">24dp</dimen>
+
 </resources>
