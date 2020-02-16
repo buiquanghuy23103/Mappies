@@ -18,6 +18,11 @@
     <string name="bookmark_details_phone_label">Phone</string>
     <string name="bookmark_details_address_label">Address</string>
 
+    <!--  Delete dialog  -->
+    <string name="delete_dialog_message">Delete?</string>
+    <string name="delete_dialog_positive_button_title">Delete</string>
+    <string name="delete_dialog_negative_button_title">Cancel</string>
+
     <!--  Photo dialog  -->
     <string name="photo_dialog_title">Photo option</string>
     <string-array name="photo_dialog_options">
