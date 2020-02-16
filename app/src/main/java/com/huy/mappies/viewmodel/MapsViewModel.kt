@@ -19,7 +19,7 @@ class MapsViewModel @Inject constructor(
     val allBookmarkViews = bookmarkRepo.allBookmarkViews
 
 
-    fun addBookmarkFromPlace(place: Place, image: Bitmap?) {
+    fun savePlaceInfoToDb(place: Place, image: Bitmap?) {
 
         viewModelScope.launch(Dispatchers.IO) {
             val bookmark = bookmarkRepo.createBookmark(place)
@@ -32,6 +32,7 @@ class MapsViewModel @Inject constructor(
         }
 
     }
+
 
 
 

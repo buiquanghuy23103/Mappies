@@ -21,16 +21,15 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.PhotoMetadata
 import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.net.FetchPhotoRequest
-import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.huy.mappies.R
 import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
 import com.huy.mappies.adapter.DrawerItemListAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
+import com.huy.mappies.utils.buildPhotoRequest
+import com.huy.mappies.utils.buildPlaceRequest
 import com.huy.mappies.utils.categoryToIconMap
 import com.huy.mappies.utils.getAppInjector
 import com.huy.mappies.viewmodel.MapsViewModel
@@ -253,11 +252,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
     }
 
     private fun handlePoiClick(pointOfInterest: PointOfInterest) {
-
-        placesClient.fetchPlace(getPlaceDetailRequest(pointOfInterest))
+        val placeRequest = buildPlaceRequest(pointOfInterest)
+        placesClient.fetchPlace(placeRequest)
             .addOnSuccessListener { response ->
                 val place = response.place
-                displayPlaceDetails(place)
+                displayPoiDetails(place)
             }
             .addOnFailureListener {error ->
                 if (error is ApiException) {
@@ -267,26 +266,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
 
     }
 
-    private fun getPlaceDetailRequest(pointOfInterest: PointOfInterest): FetchPlaceRequest {
-        val placeId = pointOfInterest.placeId
+    private fun displayPoiDetails(place: Place) {
 
-        val placeFields = listOf(
-            Place.Field.ID,
-            Place.Field.NAME,
-            Place.Field.PHONE_NUMBER,
-            Place.Field.PHOTO_METADATAS,
-            Place.Field.ADDRESS,
-            Place.Field.LAT_LNG,
-            Place.Field.TYPES
-        )
-
-        return FetchPlaceRequest.builder(placeId, placeFields)
-            .build()
-    }
-
-    private fun displayPlaceDetails(place: Place) {
-
-        val photoRequest = getPhotoRequest(place)
+        val maxWidth = resources.getDimensionPixelSize(R.dimen.default_image_width)
+        val maxHeight = resources.getDimensionPixelSize(R.dimen.default_image_height)
+        val photoRequest = buildPhotoRequest(place, maxWidth, maxHeight)
 
         if (photoRequest == null) {
             addPlaceMarker(place, null)
@@ -310,18 +294,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
 
     }
 
-    private fun getPhotoRequest(place: Place): FetchPhotoRequest? {
-        val photoMetadata: PhotoMetadata? = place.photoMetadatas?.get(0)
-        return if (photoMetadata == null) {
-            null
-        } else {
-            FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(resources.getDimensionPixelSize(R.dimen.default_image_width))
-                .setMaxHeight(resources.getDimensionPixelSize(R.dimen.default_image_height))
-                .build()
-        }
-    }
-
     private fun addPlaceMarker(place: Place, bitmap: Bitmap?) {
 
         val defaultMarkerIcon = BitmapDescriptorFactory.defaultMarker(
@@ -335,11 +307,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
             .icon(defaultMarkerIcon)
             .alpha(0.08f)
 
-        map.clear()
-
         val marker = map.addMarker(markerOptions)
         marker.tag = PlaceInfo(place, bitmap)
-
 
         marker.showInfoWindow()
     }
@@ -350,7 +319,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
             is PlaceInfo -> {
                 val placeInfo = marker.tag as PlaceInfo
                 if (placeInfo.place != null) {
-                    viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
+                    viewModel.savePlaceInfoToDb(placeInfo.place, placeInfo.image)
                 }
             }
 
