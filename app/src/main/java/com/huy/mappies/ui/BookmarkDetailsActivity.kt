@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -71,6 +73,32 @@ class BookmarkDetailsActivity : AppCompatActivity() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // Apply the adapter to the spinner
             bookmark_details_category_spinner.adapter = adapter
+        }
+
+        // onItemSelected() is always called once with an initial position of 0
+        // This causes the spinner to reset back to the first item once it is inflated
+        // Using post{} causes the code block to be placed on the main thread queue,
+        // and the execution of the code inside the braces gets delayed until the next message loop.
+        // This eliminates the initial call of onItemSelected()
+        bookmark_details_category_spinner.post {
+            bookmark_details_category_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+            {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val category = parent?.getItemAtPosition(position) as String
+                    categoryToIconMap[category]?.let {
+                        bookmark_details_category_icon.setImageResource(it)
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // NOTE: This method is required but not used
+                }
+            }
         }
     }
 
