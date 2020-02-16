@@ -1,6 +1,7 @@
 package com.huy.mappies.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,6 +13,8 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -22,16 +25,16 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.huy.mappies.R
 import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
 import com.huy.mappies.adapter.DrawerItemListAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
-import com.huy.mappies.utils.buildPhotoRequest
-import com.huy.mappies.utils.buildPlaceRequest
-import com.huy.mappies.utils.categoryToIconMap
-import com.huy.mappies.utils.getAppInjector
+import com.huy.mappies.utils.*
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.maps_drawer_view.*
@@ -43,6 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
 
     companion object {
         private const val REQUEST_LOCATION = 1
+        private const val REQUEST_AUTOCOMPLETE = 2
         private const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
     }
 
@@ -66,6 +70,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
         setupLocationClient()
         setupPlacesClient()
         setupDrawer()
+        setupSearchButton()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -102,6 +107,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
         viewModel.allBookmarkViews.observe(this, Observer {
             adapter.submitList(it)
         })
+    }
+
+    private fun setupSearchButton() {
+        search_button.setOnClickListener { searchAtCurrentLocation() }
     }
 
     private fun setupMapView() {
@@ -142,9 +151,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
         val marker = bookmarkView.id?.let { markers[it] }
         marker?.showInfoWindow()
 
-        val newLocation = LatLng(bookmarkView.latitude, bookmarkView.longtitude)
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(newLocation, 16.0f)
-        map.animateCamera(cameraUpdate)
+        zoomLocation(bookmarkView.latitude, bookmarkView.longtitude)
 
     }
 
@@ -194,17 +201,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
                     val latLng = LatLng(location.latitude, location.longitude)
                     val markerOptions = MarkerOptions().position(latLng)
                         .title("You are here")
-                    val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
 
-                    map.clear() // Remove previous marker
+                    map.clear() // Remove previous markers
                     map.addMarker(markerOptions)
-                    map.moveCamera(cameraUpdate)
+                    zoomLocation(location.latitude, location.longitude)
 
                 } else {
                     Timber.e("No location found")
                 }
 
             }
+    }
+
+    private fun zoomLocation(latitude: Double, longtitude: Double) {
+        val latLng = LatLng(latitude, longtitude)
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
+        map.animateCamera(cameraUpdate)
     }
 
     private fun locationPermissionNotGranted(): Boolean {
@@ -340,5 +352,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
         startActivity(intent)
     }
 
+    private fun searchAtCurrentLocation() {
+        val bounds = RectangularBounds.newInstance(map.projection.visibleRegion.latLngBounds)
+
+        try {
+            val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, placeFields)
+                .setLocationBias(bounds)
+                .build(this)
+            startActivityForResult(intent, REQUEST_AUTOCOMPLETE)
+        } catch (error: GooglePlayServicesRepairableException) {
+            Timber.e(error)
+            // TODO: Handle exception
+        } catch (error: GooglePlayServicesNotAvailableException) {
+            Timber.e(error)
+            // TODO: Handle exception
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode) {
+            REQUEST_AUTOCOMPLETE -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val place = Autocomplete.getPlaceFromIntent(data)
+                    place.latLng?.let { zoomLocation(it.latitude, it.longitude) }
+                    displayPoiDetails(place)
+                }
+            }
+        }
+    }
 
 }
