@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.huy.mappies.R
 import com.huy.mappies.databinding.MapsDrawerItemBinding
 import com.huy.mappies.model.BookmarkView
+import com.huy.mappies.utils.categoryToIconMap
+import timber.log.Timber
 
 class DrawerItemListAdapter(private val onDrawerItemClick: OnDrawerItemClick)
     : ListAdapter<BookmarkView, DrawerItemListAdapter.DrawerItem>(diffCallback) {
@@ -39,7 +41,6 @@ class DrawerItemListAdapter(private val onDrawerItemClick: OnDrawerItemClick)
         private val onDrawerItemClick: OnDrawerItemClick
     ) : RecyclerView.ViewHolder(binding.root)
     {
-
         companion object {
             fun from(viewGroup: ViewGroup, onDrawerItemClick: OnDrawerItemClick): DrawerItem {
 
@@ -61,7 +62,13 @@ class DrawerItemListAdapter(private val onDrawerItemClick: OnDrawerItemClick)
             binding.root.setOnClickListener {
                 onDrawerItemClick.handleDrawerItemClick(bookmarkView)
             }
+            Timber.i(bookmarkView.category)
+            val categoryIconResId = categoryToIcon(bookmarkView.category)
+            binding.drawerItemIcon.setImageResource(categoryIconResId)
         }
+
+        private fun categoryToIcon(category: String)
+            = categoryToIconMap[category] ?: R.drawable.ic_other
 
     }
 

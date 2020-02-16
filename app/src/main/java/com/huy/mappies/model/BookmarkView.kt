@@ -11,7 +11,8 @@ data class BookmarkView(
     var name: String = "",
     var phone: String = "",
     var notes: String = "",
-    var address: String = ""
+    var address: String = "",
+    var category: String = ""
 ) {
     fun getImage(context: Context): Bitmap? {
         id?.let {

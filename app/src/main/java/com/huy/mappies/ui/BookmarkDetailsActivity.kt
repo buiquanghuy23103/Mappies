@@ -9,6 +9,9 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -18,9 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.huy.mappies.R
 import com.huy.mappies.databinding.ActivityBookmarkDetailsBinding
 import com.huy.mappies.model.BookmarkView
-import com.huy.mappies.utils.ImageUtils
-import com.huy.mappies.utils.getAppInjector
-import com.huy.mappies.utils.getUri
+import com.huy.mappies.utils.*
 import com.huy.mappies.viewmodel.BookmarkDetailsViewModel
 import kotlinx.android.synthetic.main.activity_bookmark_details.*
 import timber.log.Timber
@@ -35,7 +36,7 @@ class BookmarkDetailsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: BookmarkDetailsViewModel
     private lateinit var binding: ActivityBookmarkDetailsBinding
-    private var bookmarkView: BookmarkView? = null
+    private var currentBookmarkView: BookmarkView? = null
     private var photoFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,18 +54,56 @@ class BookmarkDetailsActivity : AppCompatActivity() {
     }
 
     private fun setupFields() {
+        setupCategorySpinner()
         val bookmarkId = intent.getLongExtra(getString(R.string.intent_extra_bookmark_id), 0)
         viewModel.getBookmarkView(bookmarkId).observe(this, Observer {
             it?.let {
                 binding.bookmarkView = it
-                bookmarkView = it
-                inflatePlaceImage()
+                currentBookmarkView = it
+                inflatePlaceImage(it)
+                inflateCategory(it)
             }
         })
     }
 
-    private fun inflatePlaceImage() {
-        val imageFilename = bookmarkView?.id?.let { bookmarkViewId ->
+    private fun setupCategorySpinner() {
+        ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+            .also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            bookmark_details_category_spinner.adapter = adapter
+        }
+
+        // onItemSelected() is always called once with an initial position of 0
+        // This causes the spinner to reset back to the first item once it is inflated
+        // Using post{} causes the code block to be placed on the main thread queue,
+        // and the execution of the code inside the braces gets delayed until the next message loop.
+        // This eliminates the initial call of onItemSelected()
+        bookmark_details_category_spinner.post {
+            bookmark_details_category_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+            {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val category = parent?.getItemAtPosition(position) as String
+                    categoryToIconMap[category]?.let {
+                        bookmark_details_category_icon.setImageResource(it)
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // NOTE: This method is required but not used
+                }
+            }
+        }
+    }
+
+    private fun inflatePlaceImage(bookmarkView: BookmarkView) {
+        val imageFilename = bookmarkView.id?.let { bookmarkViewId ->
             ImageUtils.getImageFilename(bookmarkViewId)
         }
         val placeImage = ImageUtils.loadBitmapFromFile(this, imageFilename)
@@ -72,6 +111,16 @@ class BookmarkDetailsActivity : AppCompatActivity() {
         binding.bookmarkDetailsPlaceImageView.setOnClickListener {
             showPhotoOptionDialog()
         }
+    }
+
+    private fun inflateCategory(bookmarkView: BookmarkView) {
+        val selectedPosition = categories.indexOf(bookmarkView.category)
+        bookmark_details_category_spinner.setSelection(selectedPosition, true)
+
+        categoryToIconMap[bookmarkView.category]?.let {
+            bookmark_details_category_icon.setImageResource(it)
+        }
+
     }
 
     private fun showPhotoOptionDialog() {
@@ -143,11 +192,12 @@ class BookmarkDetailsActivity : AppCompatActivity() {
         val bookmarkName = bookmark_details_name_edit_text.text.toString()
         if (bookmarkName.isEmpty()) return true
 
-        val newBookmarkView = bookmarkView?.apply {
+        val newBookmarkView = currentBookmarkView?.apply {
             name = bookmark_details_name_edit_text.text.toString()
             notes = bookmark_details_notes_edit_text.text.toString()
             address = bookmark_details_address_edit_text.text.toString()
             phone = bookmark_details_phone_edit_text.text.toString()
+            category = bookmark_details_category_spinner.selectedItem as String
         }
 
         viewModel.updateBookmark(newBookmarkView)
@@ -186,7 +236,7 @@ class BookmarkDetailsActivity : AppCompatActivity() {
     }
 
     private fun updateImage(image: Bitmap) {
-        bookmarkView?.let { bookmark ->
+        currentBookmarkView?.let { bookmark ->
             val imageFilename = bookmark.id?.let { ImageUtils.getImageFilename(it) }
             ImageUtils.saveBitmapToFile(this, image, imageFilename)
             binding.bookmarkDetailsPlaceImageView.setImageBitmap(image)
