@@ -11,11 +11,17 @@
     <!--  Bookmark detail activity  -->
     <string name="bookmark_details_activity_label">Bookmark</string>
     <string name="bookmark_details_menu_action_done_label">Done</string>
+    <string name="bookmark_details_menu_action_delete_label">Delete</string>
     <string name="bookmark_details_name_label">Name</string>
     <string name="bookmark_details_category_label">Category</string>
     <string name="bookmark_details_notes_label">Notes</string>
     <string name="bookmark_details_phone_label">Phone</string>
     <string name="bookmark_details_address_label">Address</string>
+
+    <!--  Delete dialog  -->
+    <string name="delete_dialog_message">Delete?</string>
+    <string name="delete_dialog_positive_button_title">Delete</string>
+    <string name="delete_dialog_negative_button_title">Cancel</string>
 
     <!--  Photo dialog  -->
     <string name="photo_dialog_title">Photo option</string>

@@ -42,4 +42,15 @@ class BookmarkDetailsViewModel @Inject constructor(
 
     }
 
+    fun deleteBookmark(bookmarkView: BookmarkView) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val bookmark = bookmarkView.id?.let {
+                bookmarkRepo.getBookmark(it)
+            }
+            bookmark?.let {
+                bookmarkRepo.deleteBookmark(it)
+            }
+        }
+    }
+
 }

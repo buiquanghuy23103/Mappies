@@ -183,6 +183,7 @@ class BookmarkDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.bookmark_details_action_save -> saveChanges()
+            R.id.bookmark_details_action_delete -> deleteBookmark()
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -204,6 +205,20 @@ class BookmarkDetailsActivity : AppCompatActivity() {
 
         finish()
 
+        return true
+    }
+
+    private fun deleteBookmark(): Boolean {
+        MaterialAlertDialogBuilder(this)
+            .setMessage(R.string.delete_dialog_message)
+            .setPositiveButton(R.string.delete_dialog_positive_button_title) { _, _ ->
+                currentBookmarkView?.let {
+                    viewModel.deleteBookmark(it)
+                }
+                finish()
+            }
+            .setNegativeButton(R.string.delete_dialog_negative_button_title, null)
+            .show()
         return true
     }
 

@@ -1,15 +1,19 @@
 package com.huy.mappies.repository
 
+import android.content.Context
 import com.google.android.libraries.places.api.model.Place
 import com.huy.mappies.db.BookmarkDao
 import com.huy.mappies.model.Bookmark
+import com.huy.mappies.utils.ImageUtils
 import com.huy.mappies.utils.OTHER
+import com.huy.mappies.utils.deleteFile
 import com.huy.mappies.utils.placeTypeToCategoryMap
 import timber.log.Timber
 import javax.inject.Inject
 
 class BookmarkRepo @Inject constructor(
-    private val bookmarkDao: BookmarkDao
+    private val bookmarkDao: BookmarkDao,
+    private val context: Context
 ) {
 
     suspend fun insertBookmarkToDb(bookmark: Bookmark): Long? {
@@ -57,6 +61,14 @@ class BookmarkRepo @Inject constructor(
 
     suspend fun updateBookmark(bookmark: Bookmark) {
         bookmarkDao.update(bookmark)
+    }
+
+    suspend fun deleteBookmark(bookmark: Bookmark) {
+        val imageFilename = bookmark.id?.let {
+            ImageUtils.getImageFilename(it)
+        }
+        deleteFile(context, imageFilename)
+        bookmarkDao.delete(bookmark)
     }
 
 }
