@@ -212,6 +212,9 @@ class BookmarkDetailsActivity : AppCompatActivity() {
         MaterialAlertDialogBuilder(this)
             .setMessage(R.string.delete_dialog_message)
             .setPositiveButton(R.string.delete_dialog_positive_button_title) { _, _ ->
+                currentBookmarkView?.let {
+                    viewModel.deleteBookmark(it)
+                }
                 finish()
             }
             .setNegativeButton(R.string.delete_dialog_negative_button_title, null)

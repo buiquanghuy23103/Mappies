@@ -59,4 +59,8 @@ class BookmarkRepo @Inject constructor(
         bookmarkDao.update(bookmark)
     }
 
+    suspend fun deleteBookmark(bookmark: Bookmark) {
+        bookmarkDao.delete(bookmark)
+    }
+
 }
