@@ -37,8 +37,6 @@ import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.maps_drawer_view.*
 import kotlinx.android.synthetic.main.maps_main_view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -352,9 +350,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
             is PlaceInfo -> {
                 val placeInfo = marker.tag as PlaceInfo
                 if (placeInfo.place != null) {
-                    GlobalScope.launch {
-                        viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
-                    }
+                    viewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
                 }
             }
 

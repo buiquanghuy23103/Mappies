@@ -1,10 +1,11 @@
 package com.huy.mappies.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.huy.mappies.model.Bookmark
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.repository.BookmarkRepo
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,7 +17,7 @@ class BookmarkDetailsViewModel @Inject constructor(
 
     fun updateBookmark(bookmarkView: BookmarkView?) {
         if (bookmarkView == null) return
-        GlobalScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val bookmark = getBookmarkFromBookmarkView(bookmarkView)
             bookmark?.let { bookmarkRepo.updateBookmark(it) }
         }
