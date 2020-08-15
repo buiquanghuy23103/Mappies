@@ -51,4 +51,8 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
     implementation 'com.google.android.material:material:1.2.0-alpha04'
+
+    implementation 'com.huawei.hms:maps:5.0.1.300'
+    implementation 'com.huawei.hms:site:5.0.1.300'
+    implementation 'com.huawei.hms:location:5.0.0.301'
 }
