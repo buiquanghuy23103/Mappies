@@ -22,4 +22,6 @@
     -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
         AIzaSyBxbU6aZybhcg6o2BmtD6Smi3l90QLpJdc</string>
+    <string name="huawei_maps_key" templateMergeStrategy="preserve" translatable="false">
+        CV6K/HICz1wVe4CJSXEKpbT3G4aPjSRHdafqkernOAtTLxC4geiIg2HOUJUiPVB4yjdxKBEwjfXMTjC9RhIvKTW1N8yI</string>
 </resources>
