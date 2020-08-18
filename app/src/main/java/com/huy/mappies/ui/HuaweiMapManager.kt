@@ -16,6 +16,7 @@ import com.huawei.hms.site.api.SearchServiceFactory
 import com.huawei.hms.site.api.model.DetailSearchResponse
 import com.huawei.hms.site.api.model.SearchStatus
 import com.huawei.hms.site.api.model.Site
+import com.huawei.hms.site.widget.SearchIntent
 import com.huy.mappies.R
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.SiteInfo
@@ -33,9 +34,10 @@ class HuaweiMapManager(
     private val fusedLocationClient: FusedLocationProviderClient
     private val placesClient: SearchService
     private val markers = LongSparseArray<Marker>()
+    private val apiKey = activity.getString(R.string.huawei_maps_key)
 
     init {
-        val apiKey = activity.getString(R.string.huawei_maps_key)
+
 
 
         placesClient = SearchServiceFactory.create(activity, apiKey)
@@ -181,9 +183,17 @@ class HuaweiMapManager(
 //        return RectangularBounds.newInstance(map.projection.visibleRegion.latLngBounds)
 //    }
 //
-//    fun displaySearchResults(place: Place) {
-//        place.latLng?.let { zoomLocation(it.latitude, it.longitude) }
-//        displayPoiDetails(place)
-//    }
+    fun displaySearchResults(site: Site) {
+        site.location?.let {
+            zoomLocation(it.lat, it.lng)
+        }
+        addPlaceMarker(site)
+    }
+
+    fun getSearchIntent(): SearchIntent {
+        return SearchIntent().apply {
+            setApiKey(apiKey)
+        }
+    }
 
 }

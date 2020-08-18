@@ -11,23 +11,18 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException
-import com.google.android.gms.common.GooglePlayServicesRepairableException
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.Marker
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.net.PlacesClient
-import com.google.android.libraries.places.widget.Autocomplete
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.huawei.hms.api.HuaweiServicesNotAvailableException
+import com.huawei.hms.maps.HuaweiMap
+import com.huawei.hms.maps.MapFragment
+import com.huawei.hms.maps.OnMapReadyCallback
+import com.huawei.hms.maps.model.Marker
+import com.huawei.hms.site.widget.SearchIntent
 import com.huy.mappies.R
-import com.huy.mappies.adapter.BookmarkInfoWindowAdapter
 import com.huy.mappies.adapter.DrawerItemListAdapter
+import com.huy.mappies.adapter.HuaweiBookmarkInfoWindowAdapter
 import com.huy.mappies.model.BookmarkView
 import com.huy.mappies.model.PlaceInfo
 import com.huy.mappies.utils.getAppInjector
-import com.huy.mappies.utils.placeFields
 import com.huy.mappies.viewmodel.MapsViewModel
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.maps_drawer_view.*
@@ -46,9 +41,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var placesClient: PlacesClient
     private lateinit var viewModel: MapsViewModel
-    private lateinit var mapManager: MapManager
+    private lateinit var mapManager: HuaweiMapManager
+
+    private val searchIntent: SearchIntent by lazy {
+        mapManager.getSearchIntent()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,14 +56,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
         setupToolbar()
         setupDrawerToggleIcon()
         setupMapView()
-        setupPlacesClient()
         setupDrawer()
         setupSearchButton()
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        val infoWindowAdapter = BookmarkInfoWindowAdapter.from(layoutInflater)
-        mapManager = MapManager(googleMap, this, infoWindowAdapter)
+    override fun onMapReady(huaweiMap: HuaweiMap) {
+        val infoWindowAdapter = HuaweiBookmarkInfoWindowAdapter.from(layoutInflater)
+        mapManager = HuaweiMapManager(huaweiMap, this, infoWindowAdapter)
         mapManager.setupInfoWindowClickListener {
             handleInfoWindowClick(it)
         }
@@ -107,15 +104,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
 
     private fun setupMapView() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment = fragmentManager
+            .findFragmentById(R.id.map) as MapFragment
         mapFragment.getMapAsync(this)
-    }
-
-    private fun setupPlacesClient() {
-        val apiKey = getString(R.string.google_maps_key)
-        Places.initialize(this, apiKey)
-        placesClient = Places.createClient(this)
     }
 
     private fun observeBookmarkViews() {
@@ -203,14 +194,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
     private fun searchAtCurrentLocation() {
 
         try {
-            val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, placeFields)
-                .setLocationBias(mapManager.rectangularBounds())
-                .build(this)
+            val intent = searchIntent.getIntent(this)
             startActivityForResult(intent, REQUEST_AUTOCOMPLETE)
-        } catch (error: GooglePlayServicesRepairableException) {
-            Timber.e(error)
-            // TODO: Handle exception
-        } catch (error: GooglePlayServicesNotAvailableException) {
+        } catch (error: HuaweiServicesNotAvailableException) {
             Timber.e(error)
             // TODO: Handle exception
         }
@@ -222,8 +208,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
         when(requestCode) {
             REQUEST_AUTOCOMPLETE -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    val place = Autocomplete.getPlaceFromIntent(data)
-                    mapManager.displaySearchResults(place)
+                    val site = searchIntent.getSiteFromIntent(data)
+                    mapManager.displaySearchResults(site)
                 }
             }
         }

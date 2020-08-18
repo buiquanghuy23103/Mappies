@@ -1,6 +1,7 @@
 package com.huy.mappies
 
 import android.app.Application
+import com.huawei.hms.maps.MapsInitializer
 import com.huy.mappies.di.AppComponent
 import com.huy.mappies.di.DaggerAppComponent
 import timber.log.Timber
@@ -18,5 +19,6 @@ class MainApplication: Application() {
         Timber.plant(Timber.DebugTree())
         INSTANCE = this
         component = DaggerAppComponent.factory().create(this)
+        MapsInitializer.setApiKey(resources.getString(R.string.huawei_maps_key))
     }
 }
