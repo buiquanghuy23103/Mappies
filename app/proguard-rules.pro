@@ -19,16 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-"R.string.agc*",
-"R.string.hms*",
-"R.string.connect_server_fail_prompt_toast",
-"R.string.getting_message_fail_prompt_toast",
-"R.string.no_available_network_prompt_toast",
-"R.string.third_app_*",
-"R.string.upsdk_*",
-"R.layout.hms*",
-"R.layout.upsdk_*",
-"R.drawable.upsdk*",
-"R.color.upsdk*",
-"R.dimen.upsdk*",
-"R.style.upsdk*"
+-ignorewarnings
+-keepattributes *Annotation*
+-keepattributes Exceptions
+-keepattributes InnerClasses
+-keepattributes Signature
+-keepattributes SourceFile,LineNumberTable
+-keep class com.hianalytics.android.**{*;}
+-keep class com.huawei.updatesdk.**{*;}
+-keep class com.huawei.hms.**{*;}
