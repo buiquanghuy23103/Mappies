@@ -38,8 +38,6 @@ class HuaweiMapManager(
 
     init {
 
-
-
         placesClient = SearchServiceFactory.create(activity, apiKey)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
 
@@ -137,25 +135,9 @@ class HuaweiMapManager(
         map.animateCamera(cameraUpdate)
     }
 
-    fun getCurrentLocation(
-        locationPermissionNotGranted: Boolean,
-        requestLocationPermissions: () -> Unit
-    ) {
+    fun zoomInToCurrentLocation() {
+        map.isMyLocationEnabled = true
 
-        if (locationPermissionNotGranted) {
-
-            requestLocationPermissions()
-
-        } else {
-
-            map.isMyLocationEnabled = true
-            zoomInToCurrentLocation()
-
-        }
-
-    }
-
-    private fun zoomInToCurrentLocation() {
         fusedLocationClient.lastLocation
             .addOnCompleteListener {
 

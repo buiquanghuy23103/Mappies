@@ -4,7 +4,9 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,12 +32,13 @@ import kotlinx.android.synthetic.main.maps_main_view.*
 import timber.log.Timber
 import javax.inject.Inject
 
+
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdapter.OnDrawerItemClick {
 
     companion object {
         private const val REQUEST_LOCATION = 1
         private const val REQUEST_AUTOCOMPLETE = 2
-        private const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
+
     }
 
     @Inject
@@ -67,6 +70,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
             handleInfoWindowClick(it)
         }
         observeBookmarkViews()
+        goToCurrentLocation()
     }
 
     private fun setupViewModel() {
@@ -125,29 +129,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
 
     }
 
-
-    private fun getCurrentLocation() {
-
-        mapManager.getCurrentLocation(locationPermissionNotGranted()){
-            requestLocationPermissions()
+    private fun goToCurrentLocation() {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            Timber.i("sdk < 28 Q")
+            if (!locationPermissionBelow28Granted()) {
+                val strings = arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                ActivityCompat.requestPermissions(this, strings, REQUEST_LOCATION)
+            } else {
+                mapManager.zoomInToCurrentLocation()
+            }
+        } else {
+            if (!locationPermissionAbove28Granted()) {
+                val strings = arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+                ActivityCompat.requestPermissions(this, strings, REQUEST_LOCATION)
+            } else {
+                mapManager.zoomInToCurrentLocation()
+            }
         }
-
-    }
-
-
-    private fun locationPermissionNotGranted(): Boolean {
-        val permission = ActivityCompat.checkSelfPermission(this,
-            LOCATION_PERMISSION
-        )
-        val grantedPermission = PackageManager.PERMISSION_GRANTED
-        return permission != grantedPermission
-    }
-
-    private fun requestLocationPermissions() {
-        val permissions = arrayOf(LOCATION_PERMISSION)
-        ActivityCompat.requestPermissions(this, permissions,
-            REQUEST_LOCATION
-        )
     }
 
     override fun onRequestPermissionsResult(
@@ -156,10 +161,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
         grantResults: IntArray
     ) {
         if (requestCode == REQUEST_LOCATION) {
-            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getCurrentLocation()
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                if (locationPermissionBelow28Granted()) {
+                    mapManager.zoomInToCurrentLocation()
+                }
             } else {
-                Timber.e("Location permission denied")
+                if (locationPermissionAbove28Granted()) {
+                    mapManager.zoomInToCurrentLocation()
+                }
             }
         }
     }
@@ -214,5 +223,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, DrawerItemListAdap
             }
         }
     }
+
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun locationPermissionAbove28Granted(): Boolean {
+        val accessLocationBackgroundPermission = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        return locationPermissionBelow28Granted() || accessLocationBackgroundPermission
+    }
+
+    private fun locationPermissionBelow28Granted(): Boolean {
+        return (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED)
+    }
+
 
 }
