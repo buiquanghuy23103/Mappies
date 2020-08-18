@@ -24,6 +24,9 @@ import com.huy.mappies.utils.buildSiteRequest
 import com.huy.mappies.utils.categoryToIconMap
 import timber.log.Timber
 
+const val ZOOM_LARGE = 16.0f
+const val ZOOM_SMALL = 8.0f
+
 class HuaweiMapManager(
     private val map: HuaweiMap,
     private val activity: MapsActivity,
@@ -66,6 +69,8 @@ class HuaweiMapManager(
     }
 
     private fun addPlaceMarker(site: Site) {
+
+        map.clear()
 
         val defaultMarkerIcon = BitmapDescriptorFactory.defaultMarker(
             BitmapDescriptorFactory.HUE_AZURE
@@ -125,13 +130,13 @@ class HuaweiMapManager(
         val marker = bookmarkView.id?.let { markers[it] }
         marker?.showInfoWindow()
 
-        zoomLocation(bookmarkView.latitude, bookmarkView.longtitude)
+        zoomLocation(bookmarkView.latitude, bookmarkView.longtitude, ZOOM_LARGE)
     }
 
 
-    private fun zoomLocation(latitude: Double, longtitude: Double) {
+    private fun zoomLocation(latitude: Double, longtitude: Double, scale: Float) {
         val latLng = LatLng(latitude, longtitude)
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, scale)
         map.animateCamera(cameraUpdate)
     }
 
@@ -151,7 +156,7 @@ class HuaweiMapManager(
 
                     map.clear() // Remove previous markers
                     map.addMarker(markerOptions)
-                    zoomLocation(location.latitude, location.longitude)
+                    zoomLocation(location.latitude, location.longitude, ZOOM_SMALL)
 
                 } else {
                     Timber.e("No location found")
@@ -167,7 +172,7 @@ class HuaweiMapManager(
 //
     fun displaySearchResults(site: Site) {
         site.location?.let {
-            zoomLocation(it.lat, it.lng)
+            zoomLocation(it.lat, it.lng, ZOOM_LARGE)
         }
         addPlaceMarker(site)
     }
